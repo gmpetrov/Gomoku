@@ -62,7 +62,7 @@ void 	checkArgs(std::string s1, std::string s2){
 	if (!isStringDigit(s1) || !isStringDigit(s2)){
 		usage();
 	}
-	else if (std::atoi(s1.c_str()) < 10 || std::atoi(s1.c_str()) > 300 || std::atoi(s2.c_str()) < 10 || std::atoi(s2.c_str()) > 300){
+	else if (std::atoi(s1.c_str()) < 500 || std::atoi(s1.c_str()) > 2500 || std::atoi(s2.c_str()) < 500 || std::atoi(s2.c_str()) > 2500){
 		usage();
 	}
 }

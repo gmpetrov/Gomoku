@@ -24,10 +24,13 @@ SfmlHandler::SfmlHandler(int width, int height) : _w(width), _h(height){
 
 	};
 
+	// Load font
 	if (!_font.loadFromFile("fonts/Orbitron-Regular.ttf")){ exit(EXIT_FAILURE); }
 
+	// Load background texture
 	if (!_backgroundTexture.loadFromFile("imgs/wood_dark.jpg")){ std::cout << "Failt to load texture" << std::endl; exit(EXIT_FAILURE); }
 
+	// Instanciate the window
 	createWindow();
 
 	_backgroundTexture.setSmooth(true);
@@ -63,7 +66,7 @@ std::map<int, eKeys>	SfmlHandler::getKeyMap(void){
 
 void SfmlHandler::createWindow(void)
 {
-    _window = new sf::RenderWindow(sf::VideoMode(_w * BLOCK_SIZE, _h * BLOCK_SIZE), "Gomoku");
+    _window = new sf::RenderWindow(sf::VideoMode(_w, _h), "Gomoku");
 }
 
 eKeys SfmlHandler::getKeyPressed(void)
@@ -148,15 +151,25 @@ void SfmlHandler::drawBonus(int score){
 	_window->draw(text);
 }
 
-void SfmlHandler::drawGrid(void){
-
-	sf::Vertex line[] =
-	{
-	    sf::Vertex(sf::Vector2f(10, 10)),
-	    sf::Vertex(sf::Vector2f(150, 150))
-	};
-
-	_window->draw(line, 2, sf::Lines, sf::RenderStates::Default);
+void SfmlHandler::drawGrid(void)
+{
+	int offset = 100;
+	for (int j = 0; j < 19; j++){
+		for (int i = 0; i < 19; i++){
+			sf::Vertex hLine[] =
+			{
+			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset)),
+			    sf::Vertex(sf::Vector2f(i * 30 + offset + 30 + offset, j * 30 + offset))
+			};
+			sf::Vertex vLine[] =
+			{
+			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset)),
+			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset + 30 + offset))
+			};
+			_window->draw(hLine, 2, sf::Lines);
+			_window->draw(vLine, 2, sf::Lines);
+		}
+	}
 }
 
 extern "C" IGraphicHandler *create(int w, int h)
