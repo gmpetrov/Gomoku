@@ -5,7 +5,6 @@
 # include <IGraphicHandler.hpp>
 # include <SFML/Graphics.hpp>
 # include <SFML/Window.hpp>
-# include <SFML/Audio.hpp>
 
 class SfmlHandler : public IGraphicHandler{
     public:
@@ -23,6 +22,7 @@ class SfmlHandler : public IGraphicHandler{
         void show(void);
         void close(void);
         void drawBonus(int);
+        void drawGrid(void);
 
         std::map<int, eKeys> getKeyMap();
 

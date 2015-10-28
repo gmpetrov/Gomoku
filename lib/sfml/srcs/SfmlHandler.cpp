@@ -102,8 +102,15 @@ void SfmlHandler::show(){
 }
 
 void SfmlHandler::clearWindow(void){
+
+	// clear the window
 	_window->clear(sf::Color::Black);
+
+	// draw the background
 	_window->draw(_backgroundSprite);
+
+	// draw the grid obviously
+	drawGrid();
 }
 
 void SfmlHandler::drawBlock(int x, int y, eColor color){
@@ -139,6 +146,17 @@ void SfmlHandler::drawBonus(int score){
 	// text.setStyle(sf::Text::Bold | sf::Text::Underlined);
 
 	_window->draw(text);
+}
+
+void SfmlHandler::drawGrid(void){
+
+	sf::Vertex line[] =
+	{
+	    sf::Vertex(sf::Vector2f(10, 10)),
+	    sf::Vertex(sf::Vector2f(150, 150))
+	};
+
+	_window->draw(line, 2, sf::Lines, sf::RenderStates::Default);
 }
 
 extern "C" IGraphicHandler *create(int w, int h)
