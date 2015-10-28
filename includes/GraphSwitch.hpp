@@ -6,7 +6,7 @@
 
 class GraphSwitch{
 	public:
-		GraphSwitch(int w, int _h);
+		GraphSwitch(void);
 		~GraphSwitch(void);
 		GraphSwitch(const GraphSwitch & src);
 		GraphSwitch &	operator=(GraphSwitch const & rhs);
@@ -14,12 +14,9 @@ class GraphSwitch{
 		void	setGraphic(std::string g);
 		IGraphicHandler *graph;
 	private:
-		GraphSwitch(void);
 		std::string _current;
 		void 		*_dl_handler;
-		IGraphicHandler *(*_create)(int, int);
-		int			_w;
-		int			_h;
+		IGraphicHandler *(*_create)(void);
 };
 
 #endif

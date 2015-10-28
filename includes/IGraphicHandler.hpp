@@ -4,7 +4,7 @@
 # include <iostream>
 # include <Enums.hpp>
 
-# define BLOCK_SIZE 10
+# define BLOCK_SIZE 30
 
 class IGraphicHandler{
 

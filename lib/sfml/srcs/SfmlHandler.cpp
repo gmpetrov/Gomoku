@@ -1,6 +1,11 @@
 #include "SfmlHandler.hpp"
 
-SfmlHandler::SfmlHandler(int width, int height) : _w(width), _h(height){
+SfmlHandler::SfmlHandler(){
+
+	sf::VideoMode mode = sf::VideoMode::getDesktopMode();
+
+	_w = mode.width;
+	_h = mode.height;
 
 	this->_keyMap = {
 		{ sf::Keyboard::Escape, eKeys::ESC },
@@ -28,14 +33,25 @@ SfmlHandler::SfmlHandler(int width, int height) : _w(width), _h(height){
 	if (!_font.loadFromFile("fonts/Orbitron-Regular.ttf")){ exit(EXIT_FAILURE); }
 
 	// Load background texture
-	if (!_backgroundTexture.loadFromFile("imgs/wood_dark.jpg")){ std::cout << "Failt to load texture" << std::endl; exit(EXIT_FAILURE); }
+	if (!_backgroundTexture.loadFromFile("imgs/wood_dark.jpg")){ std::cout << "Failt to load background texture" << std::endl; exit(EXIT_FAILURE); }
+
+	// Load pawn texture
+	if (!_pawnTexture.loadFromFile("imgs/pawn.jpg")){ std::cout << "Failt to load pawn texture" << std::endl; exit(EXIT_FAILURE); }
 
 	// Instanciate the window
 	createWindow();
 
 	_backgroundTexture.setSmooth(true);
+	_pawnTexture.setSmooth(true);
+
 	_backgroundSprite.setTexture(_backgroundTexture);
 	_backgroundSprite.setColor(sf::Color(104, 195, 163));
+
+	_pawnSprite.setTexture(_pawnTexture);
+	_pawnSprite.setPosition(sf::Vector2f(10, 10));
+
+	_pawn = sf::CircleShape(BLOCK_SIZE / 3);
+	_pawn.setTexture(&_pawnTexture);
 }
 
 SfmlHandler::~SfmlHandler(void){}
@@ -66,7 +82,7 @@ std::map<int, eKeys>	SfmlHandler::getKeyMap(void){
 
 void SfmlHandler::createWindow(void)
 {
-    _window = new sf::RenderWindow(sf::VideoMode(_w, _h), "Gomoku");
+    _window = new sf::RenderWindow(sf::VideoMode(_w, _h), "Gomoku", sf::Style::Fullscreen);
 }
 
 eKeys SfmlHandler::getKeyPressed(void)
@@ -114,6 +130,9 @@ void SfmlHandler::clearWindow(void){
 
 	// draw the grid obviously
 	drawGrid();
+
+	// draw the background
+	_window->draw(_pawn);
 }
 
 void SfmlHandler::drawBlock(int x, int y, eColor color){
@@ -153,18 +172,25 @@ void SfmlHandler::drawBonus(int score){
 
 void SfmlHandler::drawGrid(void)
 {
-	int offset = 100;
+	int grid_size = 19 * BLOCK_SIZE;
+	int offsetX = (_w / 2) - (grid_size / 2);
+	int offsetY = (_h / 2) - (grid_size / 2);
+
+	sf::Vector2i localPosition = sf::Mouse::getPosition(*_window);
+	_pawn.setPosition(localPosition.x, localPosition.y);
+	std::cout << "x : "  << localPosition.x << ", y : " << localPosition.y << std::endl;
+
 	for (int j = 0; j < 19; j++){
 		for (int i = 0; i < 19; i++){
 			sf::Vertex hLine[] =
 			{
-			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset)),
-			    sf::Vertex(sf::Vector2f(i * 30 + offset + 30 + offset, j * 30 + offset))
+			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY)),
+			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX + BLOCK_SIZE, j * BLOCK_SIZE + offsetY))
 			};
 			sf::Vertex vLine[] =
 			{
-			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset)),
-			    sf::Vertex(sf::Vector2f(i * 30 + offset, j * 30 + offset + 30 + offset))
+			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY)),
+			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY + BLOCK_SIZE))
 			};
 			_window->draw(hLine, 2, sf::Lines);
 			_window->draw(vLine, 2, sf::Lines);
@@ -172,9 +198,9 @@ void SfmlHandler::drawGrid(void)
 	}
 }
 
-extern "C" IGraphicHandler *create(int w, int h)
+extern "C" IGraphicHandler *create()
 {
-	return new SfmlHandler(w, h);
+	return new SfmlHandler();
 }
 
 extern "C" void destroy(IGraphicHandler *handler)

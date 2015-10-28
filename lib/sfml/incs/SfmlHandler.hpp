@@ -8,7 +8,7 @@
 
 class SfmlHandler : public IGraphicHandler{
     public:
-        SfmlHandler(int w, int h);
+        SfmlHandler();
         SfmlHandler(const SfmlHandler & src);
         SfmlHandler &   operator=(SfmlHandler const & rhs);
         ~SfmlHandler(void);
@@ -36,7 +36,12 @@ class SfmlHandler : public IGraphicHandler{
         int _h;
         sf::Font _font;
         sf::Texture _backgroundTexture;
+        sf::Texture _pawnTexture;
+
+        sf::Sprite  _pawnSprite;
         sf::Sprite  _backgroundSprite;
+
+        sf::CircleShape _pawn;
 };
 
 #endif //SFML_HANDLER_HPP

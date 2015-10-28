@@ -1,8 +1,6 @@
 #include <GraphSwitch.hpp>
 
-GraphSwitch::GraphSwitch(void){}
-
-GraphSwitch::GraphSwitch(int w, int h) : _w(w), _h(h){
+GraphSwitch::GraphSwitch(void){
 	_dl_handler = NULL;
 }
 
@@ -35,13 +33,13 @@ void	GraphSwitch::setGraphic(std::string g){
 	}
 
 	// Searching for the create symbol
-	if (!(_create = (IGraphicHandler *(*)(int, int))dlsym(_dl_handler, "create"))){
+	if (!(_create = (IGraphicHandler *(*)(void))dlsym(_dl_handler, "create"))){
 		std::cerr << "Error : " << dlerror() << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
 	// Create a new instance of the grapic lib handler
-	graph = _create(_w, _h);
+	graph = _create();
 
 	// setting g as current graphic lib
 	_current = g;
