@@ -5,6 +5,7 @@
 # include <Enums.hpp>
 
 # define BLOCK_SIZE 30
+# define GRID_SIZE 19
 
 class IGraphicHandler{
 

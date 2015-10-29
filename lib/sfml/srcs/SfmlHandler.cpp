@@ -1,11 +1,13 @@
 #include "SfmlHandler.hpp"
 
-SfmlHandler::SfmlHandler(){
+SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(GRID_SIZE)){
 
 	sf::VideoMode mode = sf::VideoMode::getDesktopMode();
 
 	_w = mode.width;
 	_h = mode.height;
+
+	_block_size = _w / 40;
 
 	this->_keyMap = {
 		{ sf::Keyboard::Escape, eKeys::ESC },
@@ -26,14 +28,13 @@ SfmlHandler::SfmlHandler(){
 		{ eColor::GREEN, sf::Color(46, 204, 113) },
 		{ eColor::VIOLET, sf::Color(224, 130, 131) },
 		{ eColor::ORANGE, sf::Color(242, 121, 53) }
-
 	};
 
 	// Load font
 	if (!_font.loadFromFile("fonts/Orbitron-Regular.ttf")){ exit(EXIT_FAILURE); }
 
 	// Load background texture
-	if (!_backgroundTexture.loadFromFile("imgs/wood_dark.jpg")){ std::cout << "Failt to load background texture" << std::endl; exit(EXIT_FAILURE); }
+	if (!_backgroundTexture.loadFromFile("imgs/colored.png")){ std::cout << "Failt to load background texture" << std::endl; exit(EXIT_FAILURE); }
 
 	// Load pawn texture
 	if (!_pawnTexture.loadFromFile("imgs/pawn.jpg")){ std::cout << "Failt to load pawn texture" << std::endl; exit(EXIT_FAILURE); }
@@ -41,17 +42,27 @@ SfmlHandler::SfmlHandler(){
 	// Instanciate the window
 	createWindow();
 
+	// Init sprites & textures
 	_backgroundTexture.setSmooth(true);
 	_pawnTexture.setSmooth(true);
 
 	_backgroundSprite.setTexture(_backgroundTexture);
 	_backgroundSprite.setColor(sf::Color(104, 195, 163));
+	_backgroundSprite.setOrigin(sf::Vector2f(_w / 2, _h / 3));
 
 	_pawnSprite.setTexture(_pawnTexture);
 	_pawnSprite.setPosition(sf::Vector2f(10, 10));
 
-	_pawn = sf::CircleShape(BLOCK_SIZE / 3);
+	_pawn = sf::CircleShape(_block_size / 3);
 	_pawn.setTexture(&_pawnTexture);
+	_pawn.setOrigin(_pawn.getRadius(), _pawn.getRadius());
+
+	_setGridCoordinate();
+
+	if (!_music.openFromFile("audio/japan.ogg")){ std::cout << "Fail to load audio" << std::endl; exit(EXIT_FAILURE); }
+	_music.play();
+	_music.setPlayingOffset(sf::seconds(2));
+	_music.setLoop(true);
 }
 
 SfmlHandler::~SfmlHandler(void){}
@@ -131,6 +142,9 @@ void SfmlHandler::clearWindow(void){
 	// draw the grid obviously
 	drawGrid();
 
+	//Handle the mouse position
+	_handleMousePosition();
+
 	// draw the background
 	_window->draw(_pawn);
 }
@@ -141,9 +155,9 @@ void SfmlHandler::drawBlock(int x, int y, eColor color){
 	return ;
 
 	// Create a Rectangle
-	sf::RectangleShape block(sf::Vector2f(BLOCK_SIZE ,BLOCK_SIZE));
+	sf::RectangleShape block(sf::Vector2f(_block_size ,_block_size));
 
-	block.setPosition(x * BLOCK_SIZE, y  * BLOCK_SIZE);
+	block.setPosition(x * _block_size, y  * _block_size);
 
 	block.setFillColor(_getColor(color));
 
@@ -172,30 +186,95 @@ void SfmlHandler::drawBonus(int score){
 
 void SfmlHandler::drawGrid(void)
 {
-	int grid_size = 19 * BLOCK_SIZE;
+
+	// Draw horizontal lines
+	for (int j = 0; j < GRID_SIZE; j++){
+
+		int x1 = _grid[j][0].first;
+		int y1 = _grid[j][0].second;
+
+		int x2 = _grid[j][GRID_SIZE - 1].first;
+		int y2 = _grid[j][GRID_SIZE - 1].second;
+		sf::Vertex line[] =
+		{
+		    sf::Vertex(sf::Vector2f(x1, y1)),
+		    sf::Vertex(sf::Vector2f(x2, y2))
+		};
+		_window->draw(line, 2, sf::Lines);
+	}
+
+	// Draw vertical lines
+	for (int i = 0; i < GRID_SIZE; i++){
+		int x1 = _grid[0][i].first;
+		int y1 = _grid[0][i].second;
+
+		int x2 = _grid[GRID_SIZE - 1][i].first;
+		int y2 = _grid[GRID_SIZE - 1][i].second;
+		sf::Vertex line[] =
+		{
+		    sf::Vertex(sf::Vector2f(x1, y1)),
+		    sf::Vertex(sf::Vector2f(x2, y2))
+		};
+		_window->draw(line, 2, sf::Lines);
+	}
+}
+
+void SfmlHandler::_setGridCoordinate(void)
+{
+	int grid_size = GRID_SIZE * _block_size;
 	int offsetX = (_w / 2) - (grid_size / 2);
 	int offsetY = (_h / 2) - (grid_size / 2);
 
-	sf::Vector2i localPosition = sf::Mouse::getPosition(*_window);
-	_pawn.setPosition(localPosition.x, localPosition.y);
-	std::cout << "x : "  << localPosition.x << ", y : " << localPosition.y << std::endl;
-
-	for (int j = 0; j < 19; j++){
-		for (int i = 0; i < 19; i++){
-			sf::Vertex hLine[] =
-			{
-			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY)),
-			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX + BLOCK_SIZE, j * BLOCK_SIZE + offsetY))
-			};
-			sf::Vertex vLine[] =
-			{
-			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY)),
-			    sf::Vertex(sf::Vector2f(i * BLOCK_SIZE + offsetX, j * BLOCK_SIZE + offsetY + BLOCK_SIZE))
-			};
-			_window->draw(hLine, 2, sf::Lines);
-			_window->draw(vLine, 2, sf::Lines);
+	for (int j = 0; j < GRID_SIZE; j++){
+		for (int i = 0; i < GRID_SIZE; i++){
+			_grid[j][i] = std::make_pair(i * _block_size + offsetX, j * _block_size + offsetY);
 		}
 	}
+}
+
+void SfmlHandler::_handleMousePosition(void)
+{
+	// Mouse position
+	sf::Vector2i pos = sf::Mouse::getPosition(*_window);
+
+	// std::cout << "x : "  << pos.x << ", y : " << pos.y << std::endl;
+
+	// Get min & max value
+	int min_X = _grid[0][0].first;
+	int max_X = _grid[0][GRID_SIZE - 1].first;
+	int min_Y = _grid[0][0].second;
+	int max_Y = _grid[0][GRID_SIZE - 1].second;
+
+	// if not in the interval
+	if ((pos.x < min_X || pos.x > max_X) || (pos.y < min_Y || pos.y > max_Y)){
+		// _pawn.setPosition(pos.x, pos.y);
+		// return ;
+	}
+
+	// Know we need to find the closest grid coordinate from the mouse position
+	// Searching for the closest x
+	int x 		= _grid[0][0].first;
+	int diff 	= std::abs(pos.x - x);
+	std::pair<int, int> tmp_x = std::make_pair(x, diff);
+	for (int i = 0; i < GRID_SIZE; i++){
+		x 		= _grid[0][i].first;
+		diff 	= std::abs(pos.x - x);
+		if (diff < tmp_x.second)
+			tmp_x 	= std::make_pair(x, diff);
+	}
+
+	// Searching for the closest y
+	int y 			= _grid[0][0].second;
+	diff			= pos.y - y;
+	std::pair<int, int> tmp_y	= std::make_pair(x, diff);
+	for (int j = 0; j < GRID_SIZE; j++){
+		y		= _grid[j][0].second;
+		diff	= std::abs(pos.y - y);
+		if (diff < tmp_y.second)
+			tmp_y = std::make_pair(y, diff);
+	}
+	std::cout << "x : " << tmp_x.first << ", y : " << tmp_x.first << std::endl;
+	_pawn.setPosition(tmp_x.first, tmp_y.first);
 }
 
 extern "C" IGraphicHandler *create()

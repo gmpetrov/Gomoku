@@ -10,14 +10,8 @@ bool	isStringDigit(std::string s);
 void 	checkArgs(std::string s1, std::string s2);
 int main(void)
 {
-	// if (ac != 3){
-	// 	usage();
-	// }
-	// checkArgs(std::string(av[1]), std::string(av[2]));
 
 	srand (time(NULL));
-
-	// Board board(std::atoi(av[1]), std::atoi(av[2]));
 
 	Board board(100, 100);
 

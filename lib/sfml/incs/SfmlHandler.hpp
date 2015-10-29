@@ -5,6 +5,7 @@
 # include <IGraphicHandler.hpp>
 # include <SFML/Graphics.hpp>
 # include <SFML/Window.hpp>
+# include <SFML/Audio.hpp>
 
 class SfmlHandler : public IGraphicHandler{
     public:
@@ -27,21 +28,31 @@ class SfmlHandler : public IGraphicHandler{
         std::map<int, eKeys> getKeyMap();
 
     private:
-        sf::Color _getColor(eColor);
+        // Methods
+        sf::Color                                       _getColor(eColor);
+        void                                            _setGridCoordinate();
+        void                                            _handleMousePosition();
 
-        std::map<int, eKeys> _keyMap;
-        std::map<eColor, sf::Color> _colorMap;
-        sf::RenderWindow *_window;
-        int _w;
-        int _h;
-        sf::Font _font;
-        sf::Texture _backgroundTexture;
-        sf::Texture _pawnTexture;
+        // Attr
+        std::map<int, eKeys>                            _keyMap;
+        std::map<eColor, sf::Color>                     _colorMap;
+        sf::RenderWindow                                *_window;
+        int                                             _w;
+        int                                             _h;
 
-        sf::Sprite  _pawnSprite;
-        sf::Sprite  _backgroundSprite;
+        sf::Font                                        _font;
 
-        sf::CircleShape _pawn;
+        sf::Music                                       _music;
+
+        sf::Texture                                     _backgroundTexture;
+        sf::Texture                                     _pawnTexture;
+
+        sf::Sprite                                      _pawnSprite;
+        sf::Sprite                                      _backgroundSprite;
+
+        sf::CircleShape                                 _pawn;
+        int                                             _block_size;
+        std::vector<std::vector<std::pair<int, int>>>   _grid;
 };
 
 #endif //SFML_HANDLER_HPP
