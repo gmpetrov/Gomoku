@@ -45,7 +45,7 @@ int main(void)
 			exit(EXIT_SUCCESS);
 		}
 		mouse_pos = graphic.graph->mouseMove();
-		if (!pair_compare(mouse_pos, old_mouse_pos)){
+		if (!pair_compare(mouse_pos, old_mouse_pos) || key == eKeys::MOUSE_LEFT){
 
 			// The mouse moved, we can draw
 			board.draw(graphic.graph);
