@@ -19,15 +19,18 @@ class SfmlHandler : public IGraphicHandler{
         void createWindow(void);
         eKeys getKeyPressed(void);
         void clearWindow(void);
-        void drawBlock(int x, int y, eColor color);
+
         void show(void);
         void close(void);
-        void drawBonus(int);
-        void drawGrid(void);
         void animationLogo(void);
         eChoice drawMenu(void);
+
+        void drawPawn(int i, int j, eTurn turn);
+        void drawGrid(void);
         void    draw(void);
-        std::pair<int, int>     play(void);
+        std::pair<int, int>     play(eTurn);
+        std::pair<int, int>     mouseMove();
+
 
         std::map<int, eKeys> getKeyMap();
 
@@ -59,6 +62,7 @@ class SfmlHandler : public IGraphicHandler{
         sf::Sprite                                      _logoSprite;
 
         sf::CircleShape                                 _pawn;
+        std::pair<int, int>                             _pawnIndex;
         int                                             _block_size;
         std::vector<std::vector<std::pair<int, int>>>   _grid;
 };

@@ -37,20 +37,18 @@ int main(void)
 
 		eKeys key = graphic.graph->getKeyPressed();
 		try{
-			board.handleKey(key);
+			board.handleKey(key, graphic.graph);
 		}
 		catch(std::string const & e){
 			std::cout << e << std::endl;
 			graphic.graph->close();
 			exit(EXIT_SUCCESS);
 		}
-		mouse_pos = graphic.graph->play();
+		mouse_pos = graphic.graph->mouseMove();
 		if (!pair_compare(mouse_pos, old_mouse_pos)){
 
 			// The mouse moved, we can draw
-			graphic.graph->clearWindow();
-			graphic.graph->draw();
-			graphic.graph->show();
+			board.draw(graphic.graph);
 
 			old_mouse_pos = mouse_pos;
 		}

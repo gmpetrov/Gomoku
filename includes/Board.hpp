@@ -21,7 +21,7 @@
 # include <stdlib.h>
 # include <time.h>
 
-# define BOARD_SIZE 19
+# define GRID_SIZE 19
 
 class Board{
 	public:
@@ -33,24 +33,31 @@ class Board{
 		void quit();
 		std::vector<std::vector<eBlock>> getMap(void);
 		void initMap(void);
-		void drawMap(IGraphicHandler *graph);
 		void updateMap(void);
 		void move(void);
-		void handleKey(eKeys);
+		void handleKey(eKeys, IGraphicHandler *graph);
+		void drawPawns(std::vector<std::pair<int, int>>, IGraphicHandler *graph);
+		void draw(IGraphicHandler *graph);
 
 		bool isAlive;
 	private:
 		Board(void);
+		void	_initGrid(void);
+		bool	_isCaseEmpty(std::pair<int, int>);
+		void 	_setMove(std::pair<int, int>);
 
 		int	_width;
 		int _height;
 		eChoice		_choice;
+		eTurn		_turn;
 
 		std::vector<std::vector<eBlock>> 	_map;
 		std::vector<std::pair<int, int>>	_pawnsPlayer1;
 		std::vector<std::pair<int, int>>	_pawnsPlayer2;
 
 		time_t _elapsedTime;
+
+		std::vector<std::vector<eBlock>>   _grid;
 };
 
 #endif

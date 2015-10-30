@@ -10,6 +10,7 @@ set(SOURCE_FILES
     srcs/main.cpp
     srcs/Board.cpp
     srcs/GraphSwitch.cpp
+    srcs/Human.cpp
     )
 
 include_directories(includes)

@@ -14,8 +14,8 @@
 
 Board::Board(void){}
 
-Board::Board(eChoice choice) : isAlive(true), _choice(choice){
-
+Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN_PLAYER_1), _grid(GRID_SIZE, std::vector<eBlock>(GRID_SIZE)){
+	_initGrid();
 }
 
 Board::~Board(void){
@@ -46,21 +46,63 @@ void	Board::updateMap(void){
 		return ;
 }
 
-void 	Board::drawMap(IGraphicHandler *graph){
-	(void)graph;
-}
-
 void	Board::move(void){
 
 }
 
-void 	Board::handleKey(eKeys key){
+void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 	if (key == eKeys::ESC){
 		throw std::string("You quit !");
 	}
 	else if (key == eKeys::MOUSE_LEFT){
-		std::cout << "LEFT" << std::endl;
+		std::pair<int, int> index = graph->play(_turn);
+		if (!_isCaseEmpty(index))
+			return ;
+		_setMove(index);
+	}
+}
+
+void	Board::_initGrid(void){
+	for (int j = 0; j < GRID_SIZE; j++){
+		for (int i = 0; i < GRID_SIZE; i++){
+			_grid[j][i] = eBlock::EMPTY;
+		}
+	}
+}
+
+bool	Board::_isCaseEmpty(std::pair<int, int> index){
+	return _grid[index.second][index.first] == eBlock::EMPTY;
+}
+
+void	Board::_setMove(std::pair<int, int> index){
+
+	// Update case value
+	_grid[index.second][index.first] = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+
+	// Add a pawn to player's container
+	if (_turn == eTurn::TURN_PLAYER_1){
+		_pawnsPlayer1.push_back(index);
+	}
+	else if (_turn == eTurn::TURN_PLAYER_2){
+		_pawnsPlayer2.push_back(index);
 	}
 
-	move();
+	_turn = (_turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
+}
+
+void	Board::drawPawns(std::vector<std::pair<int, int>>	_pawns, IGraphicHandler *graph){
+	for (size_t i = 0; i < _pawns.size(); i++){
+		graph->drawPawn(_pawns[i].first, _pawns[i].second, _turn);
+	}
+}
+
+void 	Board::draw(IGraphicHandler *graph){
+
+	graph->clearWindow();
+	graph->draw();
+
+	drawPawns(_pawnsPlayer1, graph);
+	drawPawns(_pawnsPlayer2, graph);
+
+	graph->show();
 }

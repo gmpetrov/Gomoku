@@ -150,17 +150,7 @@ void SfmlHandler::show(){
 }
 
 void SfmlHandler::clearWindow(void){
-
-	// clear the window
 	_window->clear(sf::Color::Black);
-
-	// draw the grid obviously
-	// drawGrid();
-
-	//Handle the mouse position
-	// _handleMousePosition();
-
-	// _window->draw(_pawn);
 }
 
 void SfmlHandler::_drawBackground(void){
@@ -168,39 +158,26 @@ void SfmlHandler::_drawBackground(void){
 	_window->draw(_backgroundSprite);
 }
 
-void SfmlHandler::drawBlock(int x, int y, eColor color){
+void SfmlHandler::drawPawn(int i, int j, eTurn turn){
 
-	if (color == eColor::DARK_BLUE)
-	return ;
+	(void)turn;
 
-	// Create a Rectangle
-	sf::RectangleShape block(sf::Vector2f(_block_size ,_block_size));
+	int x = _grid[j][i].first;
+	int y = _grid[j][i].second;
 
-	block.setPosition(x * _block_size, y  * _block_size);
+	sf::CircleShape pawn = sf::CircleShape(_block_size / 3);
+	pawn.setTexture(&_pawnTexture);
+	pawn.setOrigin(pawn.getRadius(), pawn.getRadius());
 
-	block.setFillColor(_getColor(color));
+	pawn.setPosition(x, y);
 
-	_window->draw(block);
+	_window->draw(pawn);
 }
 
 void SfmlHandler::close(void){
 	if (_window->isOpen()){
 		_window->close();
 	}
-}
-
-void SfmlHandler::drawBonus(int score){
-
-	sf::Text text;
-
-	text.setFont(_font);
-	text.setString("Score : " + std::to_string(score));
-	text.setCharacterSize(24);
-	text.setColor(sf::Color(255, 255, 255));
-	text.setPosition(5, 5);
-	// text.setStyle(sf::Text::Bold | sf::Text::Underlined);
-
-	_window->draw(text);
 }
 
 void SfmlHandler::drawGrid(void)
@@ -251,8 +228,10 @@ void SfmlHandler::_setGridCoordinate(void)
 	}
 }
 
-std::pair<int, int> SfmlHandler::play(void)
+std::pair<int, int> SfmlHandler::mouseMove()
 {
+	int indexI = 0, indexJ = 0;
+
 	// Mouse position
 	sf::Vector2i pos = sf::Mouse::getPosition(*_window);
 
@@ -266,8 +245,10 @@ std::pair<int, int> SfmlHandler::play(void)
 		diff 	= std::abs(pos.x - x);
 
 		// Compare the current diff with current
-		if (diff < tmp_x.second)
+		if (diff < tmp_x.second){
 			tmp_x 	= std::make_pair(x, diff);
+			indexI = i;
+		}
 	}
 
 	// Searching for the closest y
@@ -277,13 +258,21 @@ std::pair<int, int> SfmlHandler::play(void)
 	for (int j = 0; j < GRID_SIZE; j++){
 		y		= _grid[j][0].second;
 		diff	= std::abs(pos.y - y);
-		if (diff < tmp_y.second)
+		if (diff < tmp_y.second){
 			tmp_y = std::make_pair(y, diff);
+			indexJ = j;
+		}
 	}
 
 	//
 	_pawn.setPosition(tmp_x.first, tmp_y.first);
+	_pawnIndex = std::make_pair(indexI, indexJ);
 	return std::make_pair(tmp_x.first, tmp_y.first);
+}
+
+std::pair<int, int> SfmlHandler::play(eTurn turn){
+	(void)turn;
+	return _pawnIndex ;
 }
 
 void SfmlHandler::animationLogo(void)
