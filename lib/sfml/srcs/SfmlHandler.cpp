@@ -57,7 +57,7 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 
 	_backgroundSprite.setTexture(_backgroundTexture);
 	// _backgroundSprite.setColor(sf::Color(104, 195, 163));
-	_backgroundSprite.setOrigin(sf::Vector2f(_w / 2, _h / 3));
+	_backgroundSprite.setOrigin(sf::Vector2f(_w / 3, _h / 3));
 
 	// Mouse pawn
 	_pawn.setTexture(_pawnTexture);
