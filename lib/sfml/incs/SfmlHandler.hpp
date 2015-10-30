@@ -25,11 +25,12 @@ class SfmlHandler : public IGraphicHandler{
         void animationLogo(void);
         eChoice drawMenu(void);
 
-        void drawPawn(int i, int j, eTurn turn);
+        void drawPawn(int i, int j, eColor);
         void drawGrid(void);
         void    draw(void);
         std::pair<int, int>     play(eTurn);
         std::pair<int, int>     mouseMove();
+        void                    drawInfos(eTurn);
 
 
         std::map<int, eKeys> getKeyMap();
@@ -57,11 +58,11 @@ class SfmlHandler : public IGraphicHandler{
         sf::Texture                                     _logoTexture;
         sf::Texture                                     _pawnTexture;
 
-        sf::Sprite                                      _pawnSprite;
+        sf::Sprite                                      _pawn;
         sf::Sprite                                      _backgroundSprite;
         sf::Sprite                                      _logoSprite;
 
-        sf::CircleShape                                 _pawn;
+        // sf::CircleShape                                 _pawn;
         std::pair<int, int>                             _pawnIndex;
         int                                             _block_size;
         std::vector<std::vector<std::pair<int, int>>>   _grid;

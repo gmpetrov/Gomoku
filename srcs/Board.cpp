@@ -90,9 +90,9 @@ void	Board::_setMove(std::pair<int, int> index){
 	_turn = (_turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
 }
 
-void	Board::drawPawns(std::vector<std::pair<int, int>>	_pawns, IGraphicHandler *graph){
+void	Board::drawPawns(std::vector<std::pair<int, int>>	_pawns, eColor color,IGraphicHandler *graph){
 	for (size_t i = 0; i < _pawns.size(); i++){
-		graph->drawPawn(_pawns[i].first, _pawns[i].second, _turn);
+		graph->drawPawn(_pawns[i].first, _pawns[i].second, color);
 	}
 }
 
@@ -101,8 +101,10 @@ void 	Board::draw(IGraphicHandler *graph){
 	graph->clearWindow();
 	graph->draw();
 
-	drawPawns(_pawnsPlayer1, graph);
-	drawPawns(_pawnsPlayer2, graph);
+	graph->drawInfos(_turn);
+
+	drawPawns(_pawnsPlayer1, eColor::PLAYER_1_COLOR, graph);
+	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
 
 	graph->show();
 }

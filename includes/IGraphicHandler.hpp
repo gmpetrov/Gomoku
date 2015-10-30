@@ -22,7 +22,8 @@ public:
 	virtual eChoice drawMenu(void) = 0;
 	virtual std::pair<int, int>	mouseMove() = 0;
 	virtual std::pair<int, int> play(eTurn) = 0;
-	virtual void drawPawn(int, int, eTurn) = 0;
+	virtual void drawPawn(int, int, eColor) = 0;
+	virtual void drawInfos(eTurn) = 0;
 };
 
 #endif // IGRAPHIC_HANDLER_HPP

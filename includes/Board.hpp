@@ -36,7 +36,7 @@ class Board{
 		void updateMap(void);
 		void move(void);
 		void handleKey(eKeys, IGraphicHandler *graph);
-		void drawPawns(std::vector<std::pair<int, int>>, IGraphicHandler *graph);
+		void drawPawns(std::vector<std::pair<int, int>>, eColor,IGraphicHandler *);
 		void draw(IGraphicHandler *graph);
 
 		bool isAlive;

@@ -28,7 +28,11 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 		{ eColor::RED, sf::Color(207, 0, 15) },
 		{ eColor::GREEN, sf::Color(46, 204, 113) },
 		{ eColor::VIOLET, sf::Color(224, 130, 131) },
-		{ eColor::ORANGE, sf::Color(242, 121, 53) }
+		{ eColor::ORANGE, sf::Color(242, 121, 53) },
+		{ eColor::PLAYER_2_COLOR, sf::Color(255, 255, 255) },
+		{ eColor::PLAYER_2_COLOR_TRANS, sf::Color(255, 255, 255, 128) },
+		{ eColor::PLAYER_1_COLOR, sf::Color(55, 55, 55) },
+		{ eColor::PLAYER_1_COLOR_TRANS, sf::Color(55, 55, 55, 128) },
 	};
 
 	// Load font
@@ -38,7 +42,7 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 	if (!_backgroundTexture.loadFromFile("imgs/colored.png")){ std::cout << "Failed to load background texture" << std::endl; exit(EXIT_FAILURE); }
 
 	// Load pawn texture
-	if (!_pawnTexture.loadFromFile("imgs/pawn.jpg")){ std::cout << "Failed to load pawn texture" << std::endl; exit(EXIT_FAILURE); }
+	if (!_pawnTexture.loadFromFile("imgs/pawn-texture.png")){ std::cout << "Failed to load pawn texture" << std::endl; exit(EXIT_FAILURE); }
 
 	// Load logo texture
 	if (!_logoTexture.loadFromFile("imgs/gomoku.png")){ std::cout << "Failed to load logo texture" << std::endl; exit(EXIT_FAILURE); }
@@ -52,15 +56,15 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 	_logoTexture.setSmooth(true);
 
 	_backgroundSprite.setTexture(_backgroundTexture);
-	_backgroundSprite.setColor(sf::Color(104, 195, 163));
+	// _backgroundSprite.setColor(sf::Color(104, 195, 163));
 	_backgroundSprite.setOrigin(sf::Vector2f(_w / 2, _h / 3));
 
-	_pawnSprite.setTexture(_pawnTexture);
-	_pawnSprite.setPosition(sf::Vector2f(10, 10));
-
-	_pawn = sf::CircleShape(_block_size / 3);
-	_pawn.setTexture(&_pawnTexture);
-	_pawn.setOrigin(_pawn.getRadius(), _pawn.getRadius());
+	// Mouse pawn
+	_pawn.setTexture(_pawnTexture);
+	sf::FloatRect rect = _pawn.getGlobalBounds();
+	_pawn.setOrigin(rect.width / 2, rect.height / 2);
+	_pawn.setScale(sf::Vector2f(0.17f, 0.17f));
+	_pawn.setColor(_colorMap[eColor::PLAYER_1_COLOR_TRANS]);
 
 	_logoSprite.setTexture(_logoTexture);
 	_logoSprite.setPosition(sf::Vector2f(10, 10));
@@ -158,16 +162,18 @@ void SfmlHandler::_drawBackground(void){
 	_window->draw(_backgroundSprite);
 }
 
-void SfmlHandler::drawPawn(int i, int j, eTurn turn){
-
-	(void)turn;
+void SfmlHandler::drawPawn(int i, int j, eColor color){
 
 	int x = _grid[j][i].first;
 	int y = _grid[j][i].second;
 
-	sf::CircleShape pawn = sf::CircleShape(_block_size / 3);
-	pawn.setTexture(&_pawnTexture);
-	pawn.setOrigin(pawn.getRadius(), pawn.getRadius());
+	sf::Sprite pawn;
+
+	pawn.setTexture(_pawnTexture);
+	sf::FloatRect rect = pawn.getGlobalBounds();
+	pawn.setOrigin(rect.width / 2, rect.height / 2);
+	pawn.setScale(sf::Vector2f(0.17f, 0.17f));
+	pawn.setColor(_colorMap[color]);
 
 	pawn.setPosition(x, y);
 
@@ -271,7 +277,14 @@ std::pair<int, int> SfmlHandler::mouseMove()
 }
 
 std::pair<int, int> SfmlHandler::play(eTurn turn){
-	(void)turn;
+
+	if (turn == eTurn::TURN_PLAYER_1){
+		_pawn.setColor(_colorMap[eColor::PLAYER_2_COLOR_TRANS]);
+	}
+	else if (turn == eTurn::TURN_PLAYER_2){
+		_pawn.setColor(_colorMap[eColor::PLAYER_1_COLOR_TRANS]);
+	}
+
 	return _pawnIndex ;
 }
 
@@ -305,7 +318,7 @@ void SfmlHandler::_drawSelectedChoice(sf::Text & choice)
 
 	sf::Vector2f pos = background.getPosition();
 
-	background.setPosition(pos.x, pos.y + 64);
+	background.setPosition(pos.x, pos.y + 74);
 
 	_window->draw(background, choice.getTransform());
 }
@@ -368,6 +381,29 @@ eChoice SfmlHandler::drawMenu(void)
 	return eChoice::QUIT;
 }
 
+void SfmlHandler::drawInfos(eTurn turn){
+	(void)turn;
+	sf::Text title;
+	title.setFont(_font);
+	title.setString("Turn :");
+	title.setCharacterSize(54);
+	title.setColor(sf::Color(255, 255, 255));
+	title.setPosition(_w / 100, _h / 100);
+
+	std::string str = (turn == eTurn::TURN_PLAYER_1 ? "Player 1" : "Player 2");
+
+	sf::FloatRect rect = title.getGlobalBounds();
+	sf::Text info;
+	info.setFont(_font);
+	info.setString(str);
+	info.setCharacterSize(54);
+	info.setColor(_colorMap[eColor::RED]);
+	info.setPosition((_w / 100) + rect.width + 25, _h / 100);
+
+	_window->draw(title);
+	_window->draw(info);
+}
+
 void SfmlHandler::draw(void){
 
 	_drawBackground();
@@ -375,9 +411,7 @@ void SfmlHandler::draw(void){
 	// draw the grid obviously
 	drawGrid();
 
-	// //Handle the mouse position
-	// _handleMousePosition();
-
+	// Draw mouse pawn
 	_window->draw(_pawn);
 }
 
