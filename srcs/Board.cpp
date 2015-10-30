@@ -14,13 +14,7 @@
 
 Board::Board(void){}
 
-Board::Board(int width, int height) : isAlive(true), _width(width), _height(height){
-
-	// Init the map
-	std::vector<std::vector<eBlock>> init(BOARD_SIZE, std::vector<eBlock>(BOARD_SIZE));
-	_map = init;
-
-	updateMap();
+Board::Board(eChoice choice) : isAlive(true), _choice(choice){
 
 }
 
@@ -47,11 +41,9 @@ std::vector<std::vector<eBlock>> Board::getMap(void){
 	return _map;
 }
 
-
 void	Board::updateMap(void){
 	if (!isAlive)
 		return ;
-
 }
 
 void 	Board::drawMap(IGraphicHandler *graph){
@@ -65,6 +57,9 @@ void	Board::move(void){
 void 	Board::handleKey(eKeys key){
 	if (key == eKeys::ESC){
 		throw std::string("You quit !");
+	}
+	else if (key == eKeys::MOUSE_LEFT){
+		std::cout << "LEFT" << std::endl;
 	}
 
 	move();

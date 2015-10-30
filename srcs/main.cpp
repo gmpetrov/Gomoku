@@ -5,21 +5,36 @@
 #include <GraphSwitch.hpp>
 #include <Board.hpp>
 
-void	usage(void);
-bool	isStringDigit(std::string s);
-void 	checkArgs(std::string s1, std::string s2);
+bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b);
+
 int main(void)
 {
 
-	srand (time(NULL));
+	std::pair<int, int> mouse_pos;
+	std::pair<int, int> old_mouse_pos;
 
-	Board board(100, 100);
+	srand (time(NULL));
 
 	GraphSwitch graphic;
 
 	graphic.setGraphic("sfml");
 
+	graphic.graph->animationLogo();
+
+	eChoice choice;
+
+	// Launch the Menu
+	if ((choice = graphic.graph->drawMenu()) == eChoice::QUIT){
+
+		// The ESC key has been pressed while in menu
+		graphic.graph->close();
+		exit(EXIT_SUCCESS);
+	}
+
+	Board board(choice);
+
 	while (board.isAlive){
+
 		eKeys key = graphic.graph->getKeyPressed();
 		try{
 			board.handleKey(key);
@@ -29,35 +44,22 @@ int main(void)
 			graphic.graph->close();
 			exit(EXIT_SUCCESS);
 		}
+		mouse_pos = graphic.graph->play();
+		if (!pair_compare(mouse_pos, old_mouse_pos)){
 
-		graphic.graph->clearWindow();
-		board.drawMap(graphic.graph);
-		graphic.graph->show();
+			// The mouse moved, we can draw
+			graphic.graph->clearWindow();
+			graphic.graph->draw();
+			graphic.graph->show();
+
+			old_mouse_pos = mouse_pos;
+		}
 	}
 	graphic.graph->close();
 	return (0);
 }
 
-void	usage(void)
+bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
 {
-	std::cout << "[Usage] : ./nibbler [ 10 <= WIDTH <= 300] [10 <= HEIGHT <= 300]" << std::endl;
-	exit(EXIT_FAILURE);
-}
-
-bool	isStringDigit(std::string s){
-	for (std::string::iterator it = s.begin(); it != s.end(); it++){
-		if (!isdigit(*it)){
-			return false;
-		}
-	}
-	return true;
-}
-
-void 	checkArgs(std::string s1, std::string s2){
-	if (!isStringDigit(s1) || !isStringDigit(s2)){
-		usage();
-	}
-	else if (std::atoi(s1.c_str()) < 500 || std::atoi(s1.c_str()) > 2500 || std::atoi(s2.c_str()) < 500 || std::atoi(s2.c_str()) > 2500){
-		usage();
-	}
+	return (a.first == b.first && a.second == b.second);
 }

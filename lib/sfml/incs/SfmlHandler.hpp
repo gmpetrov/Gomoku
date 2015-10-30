@@ -24,6 +24,10 @@ class SfmlHandler : public IGraphicHandler{
         void close(void);
         void drawBonus(int);
         void drawGrid(void);
+        void animationLogo(void);
+        eChoice drawMenu(void);
+        void    draw(void);
+        std::pair<int, int>     play(void);
 
         std::map<int, eKeys> getKeyMap();
 
@@ -31,7 +35,8 @@ class SfmlHandler : public IGraphicHandler{
         // Methods
         sf::Color                                       _getColor(eColor);
         void                                            _setGridCoordinate();
-        void                                            _handleMousePosition();
+        void                                            _drawSelectedChoice(sf::Text & choice);
+        void                                            _drawBackground(void);
 
         // Attr
         std::map<int, eKeys>                            _keyMap;
@@ -39,16 +44,19 @@ class SfmlHandler : public IGraphicHandler{
         sf::RenderWindow                                *_window;
         int                                             _w;
         int                                             _h;
+        bool                                            _isMenu;
 
         sf::Font                                        _font;
 
         sf::Music                                       _music;
 
         sf::Texture                                     _backgroundTexture;
+        sf::Texture                                     _logoTexture;
         sf::Texture                                     _pawnTexture;
 
         sf::Sprite                                      _pawnSprite;
         sf::Sprite                                      _backgroundSprite;
+        sf::Sprite                                      _logoSprite;
 
         sf::CircleShape                                 _pawn;
         int                                             _block_size;

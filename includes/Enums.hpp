@@ -11,15 +11,15 @@ enum eKeys {
 	ONE,
 	TWO,
 	THREE,
-	SPACE
+	SPACE,
+	RETURN,
+	MOUSE_LEFT
 };
 
 enum eBlock {
 	EMPTY = 0,
-	SNAKE,
-	SNAKE_HEAD,
-	FOOD,
-	BONUS
+	PLAYER_1,
+	PLAYER_2
 };
 
 enum eColor {
@@ -32,11 +32,15 @@ enum eColor {
 	ORANGE
 };
 
-enum eDirection{
-	TOP = 0,
-	TRIBORD,
-	BABORD,
-	BOTTOM
+enum eChoice{
+	HUMAN = 0,
+	IA,
+	QUIT
+};
+
+enum eTurn{
+	TURN_PLAYER_1 = 0,
+	TURN_PLAYER_2
 };
 
 #endif // ENUMS_HPP

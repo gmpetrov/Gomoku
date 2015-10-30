@@ -15,10 +15,12 @@ public:
 	virtual void createWindow(void) = 0;
 	virtual eKeys getKeyPressed(void) = 0;
 	virtual void clearWindow(void) = 0;
-	virtual void drawBlock(int, int, eColor) = 0;
-	virtual void drawBonus(int) = 0;
+	virtual void draw(void) = 0;
 	virtual void show(void) = 0;
 	virtual void close(void) = 0;
+	virtual void animationLogo(void) = 0;
+	virtual eChoice drawMenu(void) = 0;
+	virtual std::pair<int, int>	play(void) = 0;
 };
 
 #endif // IGRAPHIC_HANDLER_HPP

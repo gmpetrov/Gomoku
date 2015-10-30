@@ -25,7 +25,7 @@
 
 class Board{
 	public:
-		Board(int width, int height);
+		Board(eChoice choice);
 		~Board(void);
 		Board(const Board & src);
 		Board &	operator=(Board const & rhs);
@@ -39,14 +39,16 @@ class Board{
 		void handleKey(eKeys);
 
 		bool isAlive;
-		int  getScore() const;
 	private:
 		Board(void);
 
 		int	_width;
 		int _height;
+		eChoice		_choice;
 
-		std::vector<std::vector<eBlock>> _map;
+		std::vector<std::vector<eBlock>> 	_map;
+		std::vector<std::pair<int, int>>	_pawnsPlayer1;
+		std::vector<std::pair<int, int>>	_pawnsPlayer2;
 
 		time_t _elapsedTime;
 };
