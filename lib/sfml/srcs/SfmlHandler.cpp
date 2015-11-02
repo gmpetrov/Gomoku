@@ -56,7 +56,6 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 	_logoTexture.setSmooth(true);
 
 	_backgroundSprite.setTexture(_backgroundTexture);
-	// _backgroundSprite.setColor(sf::Color(104, 195, 163));
 	_backgroundSprite.setOrigin(sf::Vector2f(_w / 3, _h / 3));
 
 	// Mouse pawn
@@ -323,16 +322,23 @@ void SfmlHandler::_drawSelectedChoice(sf::Text & choice)
 	_window->draw(background, choice.getTransform());
 }
 
+/*
+** Handle the startup menu
+*/
+
 eChoice SfmlHandler::drawMenu(void)
 {
-	_isMenu 	= true;
-	eChoice choice 	= eChoice::QUIT;
-	eChoice newChoice = eChoice::HUMAN;
+	_isMenu 			= true;
+	eChoice choice 		= eChoice::QUIT;
+	eChoice newChoice 	= eChoice::HUMAN;
 
+	// Loop until a choice is made
 	while (_isMenu)
 	{
+		// Get the pressed Key obviously
 		eKeys key = getKeyPressed();
 
+		// Handle the key
 		if (key == eKeys::ESC)
 			return eChoice::QUIT;
 		else if (key == eKeys::DOWN || key == eKeys::UP)
@@ -342,11 +348,15 @@ eChoice SfmlHandler::drawMenu(void)
 				return choice;
 		}
 
+		// If choice has changed, we cacn draw
 		if (choice != newChoice){
+
+			// Draw the background
 			clearWindow();
 			_drawBackground();
 			_window->draw(_logoSprite);
 
+			// Configure first choice
 			sf::Text choice_1;
 			choice_1.setFont(_font);
 			choice_1.setString("1 - Human vs Human");
@@ -354,10 +364,7 @@ eChoice SfmlHandler::drawMenu(void)
 			choice_1.setColor(sf::Color(255, 255, 255));
 			choice_1.setPosition(_w / 3, _h / 2);
 
-			sf::FloatRect backgroundRect = choice_1.getLocalBounds();
-			sf::RectangleShape background(sf::Vector2f(backgroundRect.width, 2));
-			background.setFillColor(sf::Color::Red);
-
+			// Configure second choice
 			sf::Text choice_2;
 			choice_2.setFont(_font);
 			choice_2.setString("2 - Human vs IA (Available soon)");
@@ -365,24 +372,33 @@ eChoice SfmlHandler::drawMenu(void)
 			choice_2.setColor(sf::Color(255, 255, 255));
 			choice_2.setPosition(_w / 3, (_h / 2) + 100);
 
+			// Draw choices
+			_window->draw(choice_1);
+			_window->draw(choice_2);
+
+			// Draw the line pointing on the selected choice
 			if (newChoice == eChoice::HUMAN)
 				_drawSelectedChoice(choice_1);
 			else
 				_drawSelectedChoice(choice_2);
 
-			_window->draw(choice_1);
-			_window->draw(choice_2);
-
+			// Display our beautiful drawings
 			show();
 
+			// Update choice value to the actual value
 			choice = newChoice;
 		}
 	}
 	return eChoice::QUIT;
 }
 
+
+/*
+**	Display some basics infos
+*/
+
 void SfmlHandler::drawInfos(eTurn turn){
-	(void)turn;
+
 	sf::Text title;
 	title.setFont(_font);
 	title.setString("Turn :");
