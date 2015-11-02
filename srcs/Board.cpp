@@ -59,6 +59,10 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 		if (!_isCaseEmpty(index))
 			return ;
 		_setMove(index);
+		if (_checkWin(index)){
+			std::cout << "SOMEBODY WON" << std::endl;
+			isAlive = false;
+		}
 	}
 }
 
@@ -87,6 +91,7 @@ void	Board::_setMove(std::pair<int, int> index){
 		_pawnsPlayer2.push_back(index);
 	}
 
+	// Update turn
 	_turn = (_turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
 }
 
@@ -107,4 +112,123 @@ void 	Board::draw(IGraphicHandler *graph){
 	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
 
 	graph->show();
+}
+
+/*
+**	Take the last move as parameter and check if it's a win
+*/
+
+bool	Board::_checkWin(std::pair<int, int> pawn){
+
+	int	x = pawn.first;
+	int	y = pawn.second;
+
+	return (_checkWinHorizontalCheck(x, y) || _checkWinVerticalCheck(x, y));
+}
+
+bool	Board::_checkWinHorizontalCheck(int x, int y){
+
+	int counter = 0;
+	eBlock playerPawn = _grid[y][x];
+
+	// Lateral right check
+	// (x + 1) because we already know actual value at x position
+	for (int i = x + 1; i < GRID_SIZE; i++){
+
+		// right mate is current player pawn, we increment the counter
+		if (_grid[y][i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	// Lateral left check
+	// (x - 1) because we already know actual value at x position
+	for (int i = x - 1; i >= 0; i--){
+
+		// left mate is current player pawn, we increment the counter
+		if (_grid[y][i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	return (counter >= 4);
+}
+
+bool	Board::_checkWinVerticalCheck(int x, int y){
+
+	int counter = 0;
+	eBlock playerPawn = _grid[y][x];
+
+	// Vertical top check
+	// (y - 1) because we already know actual value at y position
+	for (int j = y - 1; j >= 0; j--){
+
+		if (_grid[j][x] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	// Vertical bottom check
+	// (y - 1) because we already know actual value at y position
+	for (int j = y + 1; j < GRID_SIZE; j++){
+
+		if (_grid[j][x] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	return (counter >= 4);
+}
+
+bool	Board::_checkWinDiagonalCheck(int x, int y){
+
+	int counter = 0;
+	eBlock playerPawn = _grid[y][x];
+
+	// Diagonal top right check
+	for (int i = 1; (i +  x < GRID_SIZE) && (y - i >= 0); i++){
+
+		if (_grid[y - i][x + i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	// Diagonal bottom left check
+	for (int i = 1; (i - x >= 0) && (y + i < GRID_SIZE); i++){
+
+		if (_grid[y + i][x - i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	if (counter >= 4) { return true ; }
+
+	counter = 0;
+
+	// Diagonal bottom right check
+	for (int i = 1; (i + x < GRID_SIZE) && (y + i < GRID_SIZE); i++){
+
+		if (_grid[y + i][x + i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	// Diagonal top left check
+	for (int i = 1; (i - x >= 0) && (y - i >= 0); i++){
+
+		if (_grid[y - i][x - i] == playerPawn)
+			counter++;
+		else
+			break ;
+	}
+
+	std::cout << "counter : " << counter << std::endl;
+	return (counter >= 4);
 }

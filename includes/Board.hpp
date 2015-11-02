@@ -46,6 +46,11 @@ class Board{
 		bool	_isCaseEmpty(std::pair<int, int>);
 		void 	_setMove(std::pair<int, int>);
 
+		bool	_checkWin(std::pair<int, int>);
+		bool	_checkWinHorizontalCheck(int, int);
+		bool	_checkWinVerticalCheck(int, int);
+		bool	_checkWinDiagonalCheck(int, int);
+
 		int	_width;
 		int _height;
 		eChoice		_choice;
