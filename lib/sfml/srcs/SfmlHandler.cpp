@@ -58,7 +58,8 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 	_logoTexture.setSmooth(true);
 
 	_backgroundSprite.setTexture(_backgroundTexture);
-	_backgroundSprite.setOrigin(sf::Vector2f(_w / 3, _h / 3));
+	_backgroundSprite.setOrigin(sf::Vector2f(_w / 2, _h / 2));
+	_backgroundSprite.setPosition(_w / 2, _h / 2);
 
 	// Mouse pawn
 	_pawn.setTexture(_pawnTexture);
@@ -113,7 +114,7 @@ std::map<int, eKeys>	SfmlHandler::getKeyMap(void){
 
 void SfmlHandler::createWindow(void)
 {
-    _window = new sf::RenderWindow(sf::VideoMode(_w, _h), "Gomoku", sf::Style::Fullscreen);
+	_window = new sf::RenderWindow(sf::VideoMode(_w, _h), "Gomoku", sf::Style::Fullscreen);
 }
 
 eKeys SfmlHandler::getKeyPressed(void)
@@ -123,22 +124,22 @@ eKeys SfmlHandler::getKeyPressed(void)
 	// While there is events to handle
 	while (_window->pollEvent(event))
 	{
-	    // Check the type of event
-	    if (event.type == sf::Event::Closed){
-	    	// Window Closed Event
-	    	return eKeys::ESC;
+		// Check the type of event
+		if (event.type == sf::Event::Closed){
+			// Window Closed Event
+			return eKeys::ESC;
 
-	    }
-	    else if (event.type == sf::Event::KeyPressed){
-	    	// Key Pressed
-	    	if (_keyMap.find(event.key.code) != _keyMap.end()){
-	    		return _keyMap[event.key.code];
-	    	}
-	    	return eKeys::UNKNOWN;
-	    }
-	    else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
-	    	return eKeys::MOUSE_LEFT;
-	    }
+		}
+		else if (event.type == sf::Event::KeyPressed){
+			// Key Pressed
+			if (_keyMap.find(event.key.code) != _keyMap.end()){
+				return _keyMap[event.key.code];
+			}
+			return eKeys::UNKNOWN;
+		}
+		else if (sf::Mouse::isButtonPressed(sf::Mouse::Left)){
+			return eKeys::MOUSE_LEFT;
+		}
 	}
 	return eKeys::UNKNOWN;
 }
@@ -200,8 +201,8 @@ void SfmlHandler::drawGrid(void)
 		int y2 = _grid[j][GRID_SIZE - 1].second;
 		sf::Vertex line[] =
 		{
-		    sf::Vertex(sf::Vector2f(x1, y1)),
-		    sf::Vertex(sf::Vector2f(x2, y2))
+			sf::Vertex(sf::Vector2f(x1, y1)),
+			sf::Vertex(sf::Vector2f(x2, y2))
 		};
 		_window->draw(line, 2, sf::Lines);
 	}
@@ -215,8 +216,8 @@ void SfmlHandler::drawGrid(void)
 		int y2 = _grid[GRID_SIZE - 1][i].second;
 		sf::Vertex line[] =
 		{
-		    sf::Vertex(sf::Vector2f(x1, y1)),
-		    sf::Vertex(sf::Vector2f(x2, y2))
+			sf::Vertex(sf::Vector2f(x1, y1)),
+			sf::Vertex(sf::Vector2f(x2, y2))
 		};
 		_window->draw(line, 2, sf::Lines);
 	}

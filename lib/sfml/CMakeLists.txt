@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.0.2)
 
 set(EXECUTABLE_NAME sfml)
 
-set(SFML_INCLUDE_DIR /usr/local/include)
-set(SFML_ROOT /usr/local/lib/)
-set(CMAKE_MODULE_PATH /usr/local/Cellar/sfml/2.3_1/share/SFML/cmake/Modules)
+#set(SFML_INCLUDE_DIR /usr/local/include)
+#set(SFML_ROOT /usr/local/lib/)
+#set(CMAKE_MODULE_PATH /usr/local/Cellar/sfml/2.3_1/share/SFML/cmake/Modules)
+
+set(SFML_INCLUDE_DIR /nfs/zfs-student-3/users/2013/gpetrov/.brew/include)
+set(SFML_ROOT /nfs/zfs-student-3/users/2013/gpetrov/.brew/lib/)
+set(CMAKE_MODULE_PATH /nfs/zfs-student-3/users/2013/gpetrov/.brew/Cellar/sfml/2.3_1/share/SFML/cmake/Modules)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -std=c++11")
 
