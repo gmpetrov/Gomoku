@@ -60,9 +60,10 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			return ;
 		_setMove(index);
 		if (_checkWin(index)){
-			std::cout << "SOMEBODY WON" << std::endl;
 			isAlive = false;
 		}
+		graph->setTurn(_turn);
+
 	}
 }
 

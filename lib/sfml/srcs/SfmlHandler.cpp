@@ -276,14 +276,7 @@ std::pair<int, int> SfmlHandler::mouseMove()
 }
 
 std::pair<int, int> SfmlHandler::play(eTurn turn){
-
-	if (turn == eTurn::TURN_PLAYER_1){
-		_pawn.setColor(_colorMap[eColor::PLAYER_2_COLOR_TRANS]);
-	}
-	else if (turn == eTurn::TURN_PLAYER_2){
-		_pawn.setColor(_colorMap[eColor::PLAYER_1_COLOR_TRANS]);
-	}
-
+	(void)turn;
 	return _pawnIndex ;
 }
 
@@ -429,6 +422,16 @@ void SfmlHandler::draw(void){
 
 	// Draw mouse pawn
 	_window->draw(_pawn);
+}
+
+void	SfmlHandler::setTurn(eTurn turn){
+	if (turn == eTurn::TURN_PLAYER_1){
+		_pawn.setColor(_colorMap[eColor::PLAYER_1_COLOR_TRANS]);
+	}
+	else if (turn == eTurn::TURN_PLAYER_2){
+		_pawn.setColor(_colorMap[eColor::PLAYER_2_COLOR_TRANS]);
+	}
+
 }
 
 extern "C" IGraphicHandler *create()

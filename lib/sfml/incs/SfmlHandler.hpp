@@ -31,6 +31,7 @@ class SfmlHandler : public IGraphicHandler{
         std::pair<int, int>     play(eTurn);
         std::pair<int, int>     mouseMove();
         void                    drawInfos(eTurn);
+        void                    setTurn(eTurn);
 
 
         std::map<int, eKeys> getKeyMap();
