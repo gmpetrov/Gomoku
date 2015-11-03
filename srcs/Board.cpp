@@ -123,7 +123,7 @@ bool	Board::_checkWin(std::pair<int, int> pawn){
 	int	x = pawn.first;
 	int	y = pawn.second;
 
-	return (_checkWinHorizontalCheck(x, y) || _checkWinVerticalCheck(x, y));
+	return (_checkWinHorizontalCheck(x, y) || _checkWinVerticalCheck(x, y) || _checkWinDiagonalCheck(x, y));
 }
 
 bool	Board::_checkWinHorizontalCheck(int x, int y){
@@ -190,7 +190,7 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	eBlock playerPawn = _grid[y][x];
 
 	// Diagonal top right check
-	for (int i = 1; (i +  x < GRID_SIZE) && (y - i >= 0); i++){
+	for (int i = 1; (x + i < GRID_SIZE) && (y - i >= 0); i++){
 
 		if (_grid[y - i][x + i] == playerPawn)
 			counter++;
@@ -199,7 +199,7 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	}
 
 	// Diagonal bottom left check
-	for (int i = 1; (i - x >= 0) && (y + i < GRID_SIZE); i++){
+	for (int i = 1; (x - i >= 0) && (y + i < GRID_SIZE); i++){
 
 		if (_grid[y + i][x - i] == playerPawn)
 			counter++;
@@ -212,7 +212,7 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	counter = 0;
 
 	// Diagonal bottom right check
-	for (int i = 1; (i + x < GRID_SIZE) && (y + i < GRID_SIZE); i++){
+	for (int i = 1; (x + i < GRID_SIZE) && (y + i < GRID_SIZE); i++){
 
 		if (_grid[y + i][x + i] == playerPawn)
 			counter++;
@@ -221,7 +221,7 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	}
 
 	// Diagonal top left check
-	for (int i = 1; (i - x >= 0) && (y - i >= 0); i++){
+	for (int i = 1; (x - i >= 0) && (y - i >= 0); i++){
 
 		if (_grid[y - i][x - i] == playerPawn)
 			counter++;
