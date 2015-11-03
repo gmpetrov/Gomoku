@@ -462,7 +462,7 @@ eKeys	SfmlHandler::modalShow(std::string msg){
 	// Available Commands
 	sf::Text commands;
 	commands.setFont(_font);
-	commands.setString("ESC or RETURN : close, R : re-run the game");
+	commands.setString("ESC, SPACE or RETURN : close, R : re-run the game");
 	commands.setCharacterSize(34);
 	commands.setColor(sf::Color(255, 255, 255));
 	bounds = commands.getGlobalBounds();
@@ -482,7 +482,7 @@ eKeys	SfmlHandler::modalShow(std::string msg){
 	{
 		eKeys key = getKeyPressed();
 
-		if (key == eKeys::ESC || key == eKeys::RETURN || key == eKeys::R)
+		if (key == eKeys::ESC || key == eKeys::SPACE || key == eKeys::RETURN || key == eKeys::R)
 			return key;
 	}
 }

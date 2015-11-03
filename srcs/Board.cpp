@@ -6,11 +6,13 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:45:21 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/10/10 13:09:01 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/03 16:24:32 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <Board.hpp>
+
+bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b);
 
 Board::Board(void){}
 
@@ -61,6 +63,16 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 		_setMove(index);
 		if (_checkWin(index)){
 			isAlive = false;
+
+			std::string winner = (_turn == eTurn::TURN_PLAYER_1 ? "Player 2 win" : "Player 1 win");
+
+			eKeys k = graph->modalShow(winner);
+
+			if (k == eKeys::R) { _reset(graph); }
+
+			// draw the game, to close the modal
+			draw(graph);
+
 		}
 		graph->setTurn(_turn);
 	}
@@ -71,8 +83,11 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		// Key R pressed, re-run the game
 		if (k == eKeys::R){
-			_reset();
+			_reset(graph);
 		}
+
+		// draw the game, to close the modal
+		draw(graph);
 	}
 }
 
@@ -127,9 +142,18 @@ void 	Board::draw(IGraphicHandler *graph){
 /*
 **	Reset the game
 */
-void	Board::_reset(void){
+void	Board::_reset(IGraphicHandler *graph){
+
+	// Clear pawns containers
 	_pawnsPlayer1.clear();
 	_pawnsPlayer2.clear();
+
+	// Set turn to player 1
+	_turn = eTurn::TURN_PLAYER_1;
+	graph->setTurn(_turn);
+
+	// isAlive to true
+	isAlive = true;
 }
 
 /*
@@ -248,4 +272,9 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	}
 
 	return (counter >= 4);
+}
+
+bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
+{
+	return (a.first == b.first && a.second == b.second);
 }

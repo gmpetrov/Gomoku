@@ -57,8 +57,3 @@ int main(void)
 	graphic.graph->close();
 	return (0);
 }
-
-bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
-{
-	return (a.first == b.first && a.second == b.second);
-}
