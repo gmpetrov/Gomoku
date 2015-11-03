@@ -25,6 +25,7 @@ public:
 	virtual void drawPawn(int, int, eColor) = 0;
 	virtual void drawInfos(eTurn) = 0;
 	virtual void setTurn(eTurn) = 0;
+	virtual eKeys modalShow(std::string msg) = 0;
 };
 
 #endif // IGRAPHIC_HANDLER_HPP

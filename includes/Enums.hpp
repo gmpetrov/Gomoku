@@ -13,7 +13,8 @@ enum eKeys {
 	THREE,
 	SPACE,
 	RETURN,
-	MOUSE_LEFT
+	MOUSE_LEFT,
+	R
 };
 
 enum eBlock {

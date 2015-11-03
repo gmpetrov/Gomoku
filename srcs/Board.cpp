@@ -63,7 +63,16 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			isAlive = false;
 		}
 		graph->setTurn(_turn);
+	}
+	else if (key == eKeys::SPACE){
 
+		// Pause
+		eKeys k = graph->modalShow("PAUSE");
+
+		// Key R pressed, re-run the game
+		if (k == eKeys::R){
+			_reset();
+		}
 	}
 }
 
@@ -113,6 +122,14 @@ void 	Board::draw(IGraphicHandler *graph){
 	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
 
 	graph->show();
+}
+
+/*
+**	Reset the game
+*/
+void	Board::_reset(void){
+	_pawnsPlayer1.clear();
+	_pawnsPlayer2.clear();
 }
 
 /*
@@ -230,6 +247,5 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 			break ;
 	}
 
-	std::cout << "counter : " << counter << std::endl;
 	return (counter >= 4);
 }

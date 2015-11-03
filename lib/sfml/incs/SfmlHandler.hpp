@@ -13,28 +13,29 @@ class SfmlHandler : public IGraphicHandler{
         SfmlHandler(const SfmlHandler & src);
         SfmlHandler &   operator=(SfmlHandler const & rhs);
         ~SfmlHandler(void);
-        int getWidth() const;
-        int getHeight() const;
+        int                     getWidth() const;
+        int                     getHeight() const;
 
-        void createWindow(void);
-        eKeys getKeyPressed(void);
-        void clearWindow(void);
+        void                    createWindow(void);
+        eKeys                   getKeyPressed(void);
+        void                    clearWindow(void);
 
-        void show(void);
-        void close(void);
-        void animationLogo(void);
-        eChoice drawMenu(void);
+        void                    show(void);
+        void                    close(void);
+        void                    animationLogo(void);
+        eChoice                 drawMenu(void);
 
-        void drawPawn(int i, int j, eColor);
-        void drawGrid(void);
-        void    draw(void);
+        void                    drawPawn(int i, int j, eColor);
+        void                    drawGrid(void);
+        void                    draw(void);
         std::pair<int, int>     play(eTurn);
         std::pair<int, int>     mouseMove();
         void                    drawInfos(eTurn);
         void                    setTurn(eTurn);
+        eKeys                   modalShow(std::string);
 
 
-        std::map<int, eKeys> getKeyMap();
+        std::map<int, eKeys>    getKeyMap();
 
     private:
         // Methods

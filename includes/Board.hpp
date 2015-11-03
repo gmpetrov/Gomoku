@@ -50,6 +50,7 @@ class Board{
 		bool	_checkWinHorizontalCheck(int, int);
 		bool	_checkWinVerticalCheck(int, int);
 		bool	_checkWinDiagonalCheck(int, int);
+		void	_reset(void);
 
 		int	_width;
 		int _height;

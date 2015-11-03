@@ -18,7 +18,9 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 		{ sf::Keyboard::Num1, eKeys::ONE },
 		{ sf::Keyboard::Num2, eKeys::TWO },
 		{ sf::Keyboard::Num3, eKeys::THREE },
-		{ sf::Keyboard::Return, eKeys::RETURN }
+		{ sf::Keyboard::Return, eKeys::RETURN },
+		{ sf::Keyboard::Space, eKeys::SPACE },
+		{ sf::Keyboard::R, eKeys::R }
 	};
 
 	this->_colorMap = {
@@ -433,6 +435,58 @@ void	SfmlHandler::setTurn(eTurn turn){
 	}
 
 }
+
+eKeys	SfmlHandler::modalShow(std::string msg){
+
+	// Black transparent overlay
+	sf::RectangleShape background(sf::Vector2f(_w, _h));
+	background.setFillColor(sf::Color(0, 0, 0, 180));
+
+	// Box containing the msg
+	sf::RectangleShape box(sf::Vector2f(_w / 4, _h / 4));
+	box.setFillColor(sf::Color(255, 255, 255));
+	box.setOrigin((_w / 4) / 2, (_h / 4) / 2);
+	box.setPosition(_w / 2, _h / 2 + 22);
+
+	// Message
+	sf::Text txt;
+	txt.setFont(_font);
+	txt.setString(msg);
+	txt.setCharacterSize(44);
+	txt.setColor(sf::Color(55, 55, 55));
+	sf::FloatRect bounds = txt.getGlobalBounds();
+	txt.setOrigin(bounds.width / 2, bounds.height / 2);
+	txt.setPosition(_w / 2, _h / 2);
+
+	// Available Commands
+	sf::Text commands;
+	commands.setFont(_font);
+	commands.setString("ESC or RETURN : close, R : re-run the game");
+	commands.setCharacterSize(34);
+	commands.setColor(sf::Color(255, 255, 255));
+	bounds = commands.getGlobalBounds();
+	commands.setOrigin(bounds.width / 2, bounds.height / 2);
+	commands.setPosition(_w / 2, _h - (_h / 4));
+
+	// Draw items
+	_window->draw(background);
+	_window->draw(box);
+	_window->draw(txt);
+	_window->draw(commands);
+
+	// Display the modal
+	show();
+
+	while (42)
+	{
+		eKeys key = getKeyPressed();
+
+		if (key == eKeys::ESC || key == eKeys::RETURN || key == eKeys::R)
+			return key;
+	}
+}
+
+
 
 extern "C" IGraphicHandler *create()
 {

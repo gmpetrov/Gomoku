@@ -31,6 +31,7 @@ int main(void)
 		exit(EXIT_SUCCESS);
 	}
 
+	// Instanciate the board with selected choice
 	Board board(choice);
 
 	while (board.isAlive){
