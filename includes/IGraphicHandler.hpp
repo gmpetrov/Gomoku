@@ -23,7 +23,7 @@ public:
 	virtual std::pair<int, int>	mouseMove() = 0;
 	virtual std::pair<int, int> play(eTurn) = 0;
 	virtual void drawPawn(int, int, eColor) = 0;
-	virtual void drawInfos(eTurn) = 0;
+	virtual void drawInfos(eTurn, int, int) = 0;
 	virtual void setTurn(eTurn) = 0;
 	virtual eKeys modalShow(std::string msg) = 0;
 };

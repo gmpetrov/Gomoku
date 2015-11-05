@@ -366,7 +366,7 @@ eChoice SfmlHandler::drawMenu(void)
 			choice_2.setString("2 - Human vs IA (Available soon)");
 			choice_2.setCharacterSize(54);
 			choice_2.setColor(sf::Color(255, 255, 255));
-			choice_2.setPosition(_w / 3, (_h / 2) + 100);
+			choice_2.setPosition(_w / 3, (_h / 2) + SPACING_RATIO);
 
 			// Draw choices
 			_window->draw(choice_1);
@@ -393,14 +393,14 @@ eChoice SfmlHandler::drawMenu(void)
 **	Display some basics infos
 */
 
-void SfmlHandler::drawInfos(eTurn turn){
+void SfmlHandler::drawInfos(eTurn turn, int p1Captures, int p2Captures){
 
 	sf::Text title;
 	title.setFont(_font);
 	title.setString("Turn :");
-	title.setCharacterSize(54);
+	title.setCharacterSize(CHAR_SIZE_INFO);
 	title.setColor(sf::Color(255, 255, 255));
-	title.setPosition(_w / 100, _h / 100);
+	title.setPosition(_w / SPACING_RATIO, _h / SPACING_RATIO);
 
 	std::string str = (turn == eTurn::TURN_PLAYER_1 ? "Player 1" : "Player 2");
 
@@ -408,11 +408,27 @@ void SfmlHandler::drawInfos(eTurn turn){
 	sf::Text info;
 	info.setFont(_font);
 	info.setString(str);
-	info.setCharacterSize(54);
+	info.setCharacterSize(CHAR_SIZE_INFO);
 	info.setColor(_colorMap[eColor::RED]);
-	info.setPosition((_w / 100) + rect.width + 25, _h / 100);
+	info.setPosition((_w / SPACING_RATIO) + rect.width + 25, _h / SPACING_RATIO);
+
+	sf::Text p1Score;
+	p1Score.setFont(_font);
+	p1Score.setString("Player 1 captured : " + std::to_string(p1Captures));
+	p1Score.setCharacterSize(CHAR_SIZE_INFO);
+	p1Score.setColor(sf::Color(255, 255, 255));
+	p1Score.setPosition(_w / SPACING_RATIO, _h / SPACING_RATIO + CHAR_SIZE_INFO + MARGIN_SIZE_INFO);
+
+	sf::Text p2Score;
+	p2Score.setFont(_font);
+	p2Score.setString("Player 2 captured : " + std::to_string(p2Captures));
+	p2Score.setCharacterSize(CHAR_SIZE_INFO);
+	p2Score.setColor(sf::Color(255, 255, 255));
+	p2Score.setPosition(_w / SPACING_RATIO, _h / SPACING_RATIO + CHAR_SIZE_INFO * 2 + MARGIN_SIZE_INFO);
 
 	_window->draw(title);
+	_window->draw(p1Score);
+	_window->draw(p2Score);
 	_window->draw(info);
 }
 

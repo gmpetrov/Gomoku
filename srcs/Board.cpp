@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:45:21 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/05 16:21:59 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 16:40:19 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void 	Board::draw(IGraphicHandler *graph){
 	graph->clearWindow();
 	graph->draw();
 
-	graph->drawInfos(_turn);
+	graph->drawInfos(_turn, _player1Captures, _player2Captures);
 
 	drawPawns(_pawnsPlayer1, eColor::PLAYER_1_COLOR, graph);
 	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
@@ -495,7 +495,6 @@ void	Board::_removePawn(std::vector<std::pair<int, int>> & container, std::pair<
 
 		if (pair_compare(*it, pawn)){
 			// Compare the pawns to find the one to delete
-			std::cout << "DELETE" << std::endl;
 			container.erase(it);
 			_grid[pawn.second][pawn.first] = eBlock::EMPTY;
 			return ;
@@ -510,6 +509,12 @@ void	Board::_removePawnPair(PAIR_INT a, PAIR_INT b)
 	// Delete the pawns
 	_removePawn(container, a);
 	_removePawn(container, b);
+
+	// Get the capture score of the current player
+	int & captureScore = (_turn == eTurn::TURN_PLAYER_1 ? _player1Captures : _player2Captures);
+
+	// increment the score
+	captureScore += 2;
 }
 
 void	Board::_updateTurn(IGraphicHandler *graph){

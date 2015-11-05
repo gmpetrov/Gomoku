@@ -7,6 +7,10 @@
 # include <SFML/Window.hpp>
 # include <SFML/Audio.hpp>
 
+# define CHAR_SIZE_INFO     54
+# define MARGIN_SIZE_INFO   10
+# define SPACING_RATIO      100
+
 class SfmlHandler : public IGraphicHandler{
     public:
         SfmlHandler();
@@ -30,7 +34,7 @@ class SfmlHandler : public IGraphicHandler{
         void                    draw(void);
         std::pair<int, int>     play(eTurn);
         std::pair<int, int>     mouseMove();
-        void                    drawInfos(eTurn);
+        void                    drawInfos(eTurn, int, int);
         void                    setTurn(eTurn);
         eKeys                   modalShow(std::string);
 
