@@ -20,7 +20,9 @@ enum eKeys {
 enum eBlock {
 	EMPTY = 0,
 	PLAYER_1,
-	PLAYER_2
+	PLAYER_2,
+	PLAYER_1_FORBIDDEN,
+	PLAYER_2_FORBIDDEN
 };
 
 enum eColor {
@@ -34,7 +36,8 @@ enum eColor {
 	PLAYER_1_COLOR,
 	PLAYER_1_COLOR_TRANS,
 	PLAYER_2_COLOR,
-	PLAYER_2_COLOR_TRANS
+	PLAYER_2_COLOR_TRANS,
+	PLAYER_FORBIDDEN
 };
 
 enum eChoice{

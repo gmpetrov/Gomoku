@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:45:21 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/05 16:40:19 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 17:38:58 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 	if (key == eKeys::ESC){
 
 		// Exit the game
-		throw std::string("You quit !");
+		throw std::string("quit");
 	}
 	else if (key == eKeys::MOUSE_LEFT){
 
@@ -76,24 +76,18 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			// checkCapture will respond with a pointer on a pairs of coordinate of the pawns to remove in case of capture
 			// Remember to delete the pointer after utilisation
 
+			// Delete the pairs
 			_removePawnPair((*ptr).first, (*ptr).second);
+
+			// Update scores
+			_updateCaptureScore();
 
 			// Clean
 			delete ptr;
 		}
 		else if (_checkWin(index)){
 			// It's a winner move
-
-			isAlive = false;
-
-			std::string winner = (_turn == eTurn::TURN_PLAYER_1 ? "Player 1 win" : "Player 2 win");
-
-			eKeys k = graph->modalShow(winner);
-
-			if (k == eKeys::R) { _reset(graph); }
-
-			// draw the game, to close the modal
-			draw(graph);
+			throw std::string("win");
 		}
 
 		// Update turn obviously
@@ -106,7 +100,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		// Key R pressed, re-run the game
 		if (k == eKeys::R){
-			_reset(graph);
+			reset(graph);
 		}
 
 		// draw the game, to close the modal
@@ -162,7 +156,7 @@ void 	Board::draw(IGraphicHandler *graph){
 /*
 **	Reset the game
 */
-void	Board::_reset(IGraphicHandler *graph){
+void	Board::reset(IGraphicHandler *graph){
 
 	// empty the grid
 	_initGrid();
@@ -509,12 +503,6 @@ void	Board::_removePawnPair(PAIR_INT a, PAIR_INT b)
 	// Delete the pawns
 	_removePawn(container, a);
 	_removePawn(container, b);
-
-	// Get the capture score of the current player
-	int & captureScore = (_turn == eTurn::TURN_PLAYER_1 ? _player1Captures : _player2Captures);
-
-	// increment the score
-	captureScore += 2;
 }
 
 void	Board::_updateTurn(IGraphicHandler *graph){
@@ -526,8 +514,21 @@ void	Board::_updateTurn(IGraphicHandler *graph){
 	graph->setTurn(_turn);
 }
 
+void	Board::_updateCaptureScore(void){
+
+	// Get the capture score of the current player
+	int & captureScore = (_turn == eTurn::TURN_PLAYER_1 ? _player1Captures : _player2Captures);
+
+	// increment the score
+	captureScore += 2;
+}
+
 std::pair<int, int>	Board::_createEmptyPair(void){
 	return std::make_pair(-42, -42);
+}
+
+eTurn	Board::getTurn(){
+	return _turn;
 }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)

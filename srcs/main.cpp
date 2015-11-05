@@ -41,9 +41,28 @@ int main(void)
 			board.handleKey(key, graphic.graph);
 		}
 		catch(std::string const & e){
-			std::cout << e << std::endl;
-			graphic.graph->close();
-			exit(EXIT_SUCCESS);
+
+			if (e.compare("quit") == 0){
+
+				std::cout << e << std::endl;
+				graphic.graph->close();
+				exit(EXIT_SUCCESS);
+			}
+			else if (e.compare("win") == 0){
+
+				std::string winner = (board.getTurn() == eTurn::TURN_PLAYER_1 ? "Player 1 win" : "Player 2 win");
+
+				eKeys k = graphic.graph->modalShow(winner);
+
+				// Exit the game
+				if (k != eKeys::R) { exit(EXIT_SUCCESS); }
+
+				// Reset the game
+				board.reset(graphic.graph);
+
+				// draw the game, to close the modal
+				board.draw(graphic.graph);
+			}
 		}
 		mouse_pos = graphic.graph->mouseMove();
 		if (!pair_compare(mouse_pos, old_mouse_pos) || key == eKeys::MOUSE_LEFT){

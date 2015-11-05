@@ -35,6 +35,7 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 		{ eColor::PLAYER_2_COLOR_TRANS, sf::Color(255, 255, 255, 128) },
 		{ eColor::PLAYER_1_COLOR, sf::Color(55, 55, 55) },
 		{ eColor::PLAYER_1_COLOR_TRANS, sf::Color(55, 55, 55, 128) },
+		{ eColor::PLAYER_FORBIDDEN, sf::Color(207, 0, 15, 128) }
 	};
 
 	// Load font

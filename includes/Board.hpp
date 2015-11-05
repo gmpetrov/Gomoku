@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:44:42 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/05 16:24:30 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 17:34:34 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 
 # define GRID_SIZE 19
 # define PAIR_INT std::pair<int, int>
+# define CAPTURE_SCORE_WIN 10
 
 class Board{
 	public:
@@ -39,6 +40,8 @@ class Board{
 		void 								handleKey(eKeys, IGraphicHandler *graph);
 		void 								drawPawns(std::vector<std::pair<int, int>>, eColor,IGraphicHandler *);
 		void 								draw(IGraphicHandler *graph);
+		void								reset(IGraphicHandler *);
+		eTurn								getTurn(void);
 
 		bool 								isAlive;
 	private:
@@ -62,8 +65,8 @@ class Board{
 		void								_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn);
 		void								_removePawnPair(PAIR_INT, PAIR_INT);
 
-		void								_reset(IGraphicHandler *);
 		void								_updateTurn(IGraphicHandler *);
+		void								_updateCaptureScore(void);
 
 		int									_width;
 		int 								_height;
