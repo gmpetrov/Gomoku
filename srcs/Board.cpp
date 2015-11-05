@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:45:21 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/05 12:24:35 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 16:21:59 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b);
 
 Board::Board(void){}
 
-Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN_PLAYER_1), _grid(GRID_SIZE, std::vector<eBlock>(GRID_SIZE)){
+Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN_PLAYER_1), _grid(GRID_SIZE, std::vector<eBlock>(GRID_SIZE)), _player1Captures(0), _player2Captures(0){
 	_initGrid();
 }
 
@@ -54,25 +54,39 @@ void	Board::move(void){
 
 void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 	if (key == eKeys::ESC){
+
+		// Exit the game
 		throw std::string("You quit !");
 	}
 	else if (key == eKeys::MOUSE_LEFT){
+
+		// Get the index of the current move
 		std::pair<int, int> index = graph->play(_turn);
+
+		// Check that the grid is empty at move's coordinates
 		if (!_isCaseEmpty(index))
 			return ;
+
+		// Set the move on the grid
 		_setMove(index);
-		if (_checkCapture(index)){
-			eKeys k = graph->modalShow("CAPTURE");
 
-			if (k == eKeys::R) { _reset(graph); }
+		std::pair<PAIR_INT, PAIR_INT> *ptr;
 
-			// draw the game, to close the modal
-			draw(graph);
+		if ((ptr = _checkCapture(index)) != NULL){
+			// checkCapture will respond with a pointer on a pairs of coordinate of the pawns to remove in case of capture
+			// Remember to delete the pointer after utilisation
+
+			_removePawnPair((*ptr).first, (*ptr).second);
+
+			// Clean
+			delete ptr;
 		}
 		else if (_checkWin(index)){
+			// It's a winner move
+
 			isAlive = false;
 
-			std::string winner = (_turn == eTurn::TURN_PLAYER_1 ? "Player 2 win" : "Player 1 win");
+			std::string winner = (_turn == eTurn::TURN_PLAYER_1 ? "Player 1 win" : "Player 2 win");
 
 			eKeys k = graph->modalShow(winner);
 
@@ -80,9 +94,10 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 			// draw the game, to close the modal
 			draw(graph);
-
 		}
-		graph->setTurn(_turn);
+
+		// Update turn obviously
+		_updateTurn(graph);
 	}
 	else if (key == eKeys::SPACE){
 
@@ -123,9 +138,6 @@ void	Board::_setMove(std::pair<int, int> index){
 	else if (_turn == eTurn::TURN_PLAYER_2){
 		_pawnsPlayer2.push_back(index);
 	}
-
-	// Update turn
-	_turn = (_turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
 }
 
 void	Board::drawPawns(std::vector<std::pair<int, int>>	_pawns, eColor color,IGraphicHandler *graph){
@@ -151,6 +163,9 @@ void 	Board::draw(IGraphicHandler *graph){
 **	Reset the game
 */
 void	Board::_reset(IGraphicHandler *graph){
+
+	// empty the grid
+	_initGrid();
 
 	// Clear pawns containers
 	_pawnsPlayer1.clear();
@@ -282,15 +297,24 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	return (counter >= 4);
 }
 
-bool	Board::_checkCapture(std::pair<int, int> index){
+std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCapture(std::pair<int, int> index){
 
 	int x = index.first;
 	int y = index.second;
 
-	return (_checkCaptureHorizontal(x, y) || _checkCaptureVertical(x, y) || _checkCaptureDiagonal(x, y));
+	// return (_checkCaptureHorizontal(x, y) || _checkCaptureVertical(x, y) || _checkCaptureDiagonal(x, y));
+	// return _checkCaptureHorizontal(x, y);
+	std::pair<PAIR_INT, PAIR_INT> *ptr;
+	if ((ptr = _checkCaptureHorizontal(x, y)) != NULL)
+		return ptr;
+	else if ((ptr = _checkCaptureVertical(x, y)) != NULL)
+		return ptr;
+	else if ((ptr = _checkCaptureDiagonal(x, y)) != NULL)
+		return ptr;
+	return NULL ;
 }
 
-bool	Board::_checkCaptureHorizontal(int x, int y){
+std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureHorizontal(int x, int y){
 
 	// get player pawn
 	eBlock playerPawn = _grid[y][x];
@@ -308,7 +332,11 @@ bool	Board::_checkCaptureHorizontal(int x, int y){
 			_grid[y][x + 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x + 1, y);
+			std::pair<int, int> b(x + 2, y);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
@@ -321,13 +349,18 @@ bool	Board::_checkCaptureHorizontal(int x, int y){
 			_grid[y][x - 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x - 1, y);
+			std::pair<int, int> b(x - 2, y);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
-	return false ;
+
+	return NULL ;
 }
 
-bool	Board::_checkCaptureVertical(int x, int y){
+std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureVertical(int x, int y){
 
 	// get player pawn
 	eBlock playerPawn = _grid[y][x];
@@ -338,14 +371,18 @@ bool	Board::_checkCaptureVertical(int x, int y){
 	// Check if we are out of bounds
 	if (y + 3 < GRID_SIZE){
 
-		// Check from top ro bottom
+		// Check from top to bottom
 		if (_grid[y][x] == playerPawn &&
 			_grid[y + 1][x] == opponentPawn &&
 			_grid[y + 2][x] == opponentPawn &&
 			_grid[y + 3][x] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x, y + 1);
+			std::pair<int, int> b(x, y + 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
@@ -358,13 +395,17 @@ bool	Board::_checkCaptureVertical(int x, int y){
 			_grid[y - 3][x] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x, y - 1);
+			std::pair<int, int> b(x, y - 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);;
 		}
 	}
-	return false ;
+	return NULL;
 }
 
-bool 	Board::_checkCaptureDiagonal(int x, int y){
+std::pair<PAIR_INT, PAIR_INT>  *	Board::_checkCaptureDiagonal(int x, int y){
 
 	// get player pawn
 	eBlock playerPawn = _grid[y][x];
@@ -382,12 +423,17 @@ bool 	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y - 3][x + 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x + 1, y - 1);
+			std::pair<int, int> b(x + 2, y - 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
 	// Check if we are not out of bounds
 	if (x + 3 < GRID_SIZE && y + 3 < GRID_SIZE){
+
 		// Check from top to bottom right
 		if (_grid[y][x] == playerPawn &&
 			_grid[y + 1][x + 1] == opponentPawn &&
@@ -395,7 +441,11 @@ bool 	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y + 3][x + 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x + 1, y + 1);
+			std::pair<int, int> b(x + 2, y + 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
@@ -409,7 +459,11 @@ bool 	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y + 3][x - 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x - 1, y + 1);
+			std::pair<int, int> b(x - 2, y + 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
@@ -423,11 +477,52 @@ bool 	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y - 3][x - 3] == playerPawn
 		   )
 		{
-			return true;
+
+			// Return the coordinates of the pawns
+			std::pair<int, int> a(x - 1, y - 1);
+			std::pair<int, int> b(x - 2, y - 2);
+			return new std::pair<PAIR_INT, PAIR_INT>(a, b);
 		}
 	}
 
-	return false;
+	return NULL;
+}
+
+void	Board::_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn){
+
+	// Loop through the container
+	for (std::vector<std::pair<int, int>>::iterator it = container.begin(); it != container.end(); ++it){
+
+		if (pair_compare(*it, pawn)){
+			// Compare the pawns to find the one to delete
+			std::cout << "DELETE" << std::endl;
+			container.erase(it);
+			_grid[pawn.second][pawn.first] = eBlock::EMPTY;
+			return ;
+		}
+	}
+}
+
+void	Board::_removePawnPair(PAIR_INT a, PAIR_INT b)
+{
+	std::vector<std::pair<int, int>> & container = (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer2 : _pawnsPlayer1);
+
+	// Delete the pawns
+	_removePawn(container, a);
+	_removePawn(container, b);
+}
+
+void	Board::_updateTurn(IGraphicHandler *graph){
+
+	// Update turn
+	_turn = (_turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
+
+	// Update the turn on the graphic interface (especially for the mouse to update his sprite)
+	graph->setTurn(_turn);
+}
+
+std::pair<int, int>	Board::_createEmptyPair(void){
+	return std::make_pair(-42, -42);
 }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
