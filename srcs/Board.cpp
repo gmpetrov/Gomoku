@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:45:21 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/03 16:24:32 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 12:24:35 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,15 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 		if (!_isCaseEmpty(index))
 			return ;
 		_setMove(index);
-		if (_checkWin(index)){
+		if (_checkCapture(index)){
+			eKeys k = graph->modalShow("CAPTURE");
+
+			if (k == eKeys::R) { _reset(graph); }
+
+			// draw the game, to close the modal
+			draw(graph);
+		}
+		else if (_checkWin(index)){
 			isAlive = false;
 
 			std::string winner = (_turn == eTurn::TURN_PLAYER_1 ? "Player 2 win" : "Player 1 win");
@@ -272,6 +280,154 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 	}
 
 	return (counter >= 4);
+}
+
+bool	Board::_checkCapture(std::pair<int, int> index){
+
+	int x = index.first;
+	int y = index.second;
+
+	return (_checkCaptureHorizontal(x, y) || _checkCaptureVertical(x, y) || _checkCaptureDiagonal(x, y));
+}
+
+bool	Board::_checkCaptureHorizontal(int x, int y){
+
+	// get player pawn
+	eBlock playerPawn = _grid[y][x];
+
+	// get opponent pawn
+	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	// Check bounds
+	if (x + 3 < GRID_SIZE){
+
+		// Check from left ro right
+		if (_grid[y][x] == playerPawn &&
+			_grid[y][x + 1] == opponentPawn &&
+			_grid[y][x + 2] == opponentPawn &&
+			_grid[y][x + 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	if (x - 3 >= 0){
+
+		// Check from right to left
+		if (_grid[y][x] == playerPawn &&
+			_grid[y][x - 1] == opponentPawn &&
+			_grid[y][x - 2] == opponentPawn &&
+			_grid[y][x - 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+	return false ;
+}
+
+bool	Board::_checkCaptureVertical(int x, int y){
+
+	// get player pawn
+	eBlock playerPawn = _grid[y][x];
+
+	// get opponent pawn
+	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	// Check if we are out of bounds
+	if (y + 3 < GRID_SIZE){
+
+		// Check from top ro bottom
+		if (_grid[y][x] == playerPawn &&
+			_grid[y + 1][x] == opponentPawn &&
+			_grid[y + 2][x] == opponentPawn &&
+			_grid[y + 3][x] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	if (y - 3 >= 0){
+
+		// Check from bottom to top
+		if (_grid[y][x] == playerPawn &&
+			_grid[y - 1][x] == opponentPawn &&
+			_grid[y - 2][x] == opponentPawn &&
+			_grid[y - 3][x] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+	return false ;
+}
+
+bool 	Board::_checkCaptureDiagonal(int x, int y){
+
+	// get player pawn
+	eBlock playerPawn = _grid[y][x];
+
+	// get opponent pawn
+	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	// Check if we are not out of bounds
+	if (x + 3 < GRID_SIZE && y - 3 >= 0){
+
+		// Check from bottom to top right
+		if (_grid[y][x] == playerPawn &&
+			_grid[y - 1][x + 1] == opponentPawn &&
+			_grid[y - 2][x + 2] == opponentPawn &&
+			_grid[y - 3][x + 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	// Check if we are not out of bounds
+	if (x + 3 < GRID_SIZE && y + 3 < GRID_SIZE){
+		// Check from top to bottom right
+		if (_grid[y][x] == playerPawn &&
+			_grid[y + 1][x + 1] == opponentPawn &&
+			_grid[y + 2][x + 2] == opponentPawn &&
+			_grid[y + 3][x + 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	// Check if we are not out of bounds
+	if (x - 3 >= 0 && y + 3 < GRID_SIZE){
+
+		// Check from top to bottom left
+		if (_grid[y][x] == playerPawn &&
+			_grid[y + 1][x - 1] == opponentPawn &&
+			_grid[y + 2][x - 2] == opponentPawn &&
+			_grid[y + 3][x - 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	// Check if we are not out of bounds
+	if (x - 3 >= 0 && y - 3 >= 0){
+
+		// Check from bottom to top left
+		if (_grid[y][x] == playerPawn &&
+			_grid[y - 1][x - 1] == opponentPawn &&
+			_grid[y - 2][x - 2] == opponentPawn &&
+			_grid[y - 3][x - 3] == playerPawn
+		   )
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)

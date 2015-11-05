@@ -6,7 +6,7 @@
 /*   By: gpetrov <gpetrov@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/10/10 12:44:42 by gpetrov           #+#    #+#             */
-/*   Updated: 2015/11/03 16:31:10 by gpetrov          ###   ########.fr       */
+/*   Updated: 2015/11/05 12:01:52 by gpetrov          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,9 @@ class Board{
 		bool	_checkWinDiagonalCheck(int, int);
 
 		bool	_checkCapture(std::pair<int, int>);
-		bool	_checkCaptureHorizontal(std::pair<int, int>);
-		bool	_checkCaptureVertical(std::pair<int, int>);
-		bool	_checkCaptureDiagonal(std::pair<int, int>);
+		bool	_checkCaptureHorizontal(int, int);
+		bool	_checkCaptureVertical(int, int);
+		bool	_checkCaptureDiagonal(int, int);
 
 		void	_reset(IGraphicHandler *);
 
