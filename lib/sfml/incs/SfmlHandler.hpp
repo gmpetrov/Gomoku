@@ -7,7 +7,7 @@
 # include <SFML/Window.hpp>
 # include <SFML/Audio.hpp>
 
-# define CHAR_SIZE_INFO     54
+# define CHAR_SIZE_INFO     34
 # define MARGIN_SIZE_INFO   10
 # define SPACING_RATIO      100
 

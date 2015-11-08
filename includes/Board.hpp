@@ -49,6 +49,8 @@ class Board{
 		void								_initGrid(void);
 		bool								_isCaseEmpty(std::pair<int, int>);
 		void 								_setMove(std::pair<int, int>);
+		std::vector<std::pair<int, int>> &	_getCurrentPlayerPawns(void);
+		std::vector<std::pair<int, int>> &	_getOpponentPawns(void);
 
 		bool								_checkWin(std::pair<int, int>);
 		bool								_checkWinHorizontalCheck(int, int);
@@ -61,6 +63,9 @@ class Board{
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureHorizontal(int, int);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureVertical(int, int);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureDiagonal(int, int);
+
+		bool								_checkEndingCapture(std::pair<int, int>);
+		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
 
 		void								_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn);
 		void								_removePawnPair(PAIR_INT, PAIR_INT);

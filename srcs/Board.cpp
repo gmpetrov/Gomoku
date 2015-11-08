@@ -86,8 +86,14 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			delete ptr;
 		}
 		else if (_checkWin(index)){
-			// It's a winner move
-			throw std::string("win");
+
+			// Check if there is a possible end capture move
+			if (!_checkEndingCapture(index)){
+				// It's a winner move
+				throw std::string("win");
+			}
+			std::cout << "POSSIBLE END CAPTURE" << std::endl;
+
 		}
 
 		// Update turn obviously
@@ -169,6 +175,10 @@ void	Board::reset(IGraphicHandler *graph){
 	_turn = eTurn::TURN_PLAYER_1;
 	graph->setTurn(_turn);
 
+	// Reset scores
+	_player1Captures = 0;
+	_player2Captures = 0;
+
 	// isAlive to true
 	isAlive = true;
 }
@@ -188,7 +198,9 @@ bool	Board::_checkWin(std::pair<int, int> pawn){
 bool	Board::_checkWinHorizontalCheck(int x, int y){
 
 	int counter = 0;
-	eBlock playerPawn = _grid[y][x];
+	eBlock playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+
+	if (_grid[y][x] == playerPawn){ counter++; }
 
 	// Lateral right check
 	// (x + 1) because we already know actual value at x position
@@ -212,13 +224,15 @@ bool	Board::_checkWinHorizontalCheck(int x, int y){
 			break ;
 	}
 
-	return (counter >= 4);
+	return (counter >= 5);
 }
 
 bool	Board::_checkWinVerticalCheck(int x, int y){
 
 	int counter = 0;
-	eBlock playerPawn = _grid[y][x];
+	eBlock playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+
+	if (_grid[y][x] == playerPawn){ counter++; }
 
 	// Vertical top check
 	// (y - 1) because we already know actual value at y position
@@ -240,13 +254,15 @@ bool	Board::_checkWinVerticalCheck(int x, int y){
 			break ;
 	}
 
-	return (counter >= 4);
+	return (counter >= 5);
 }
 
 bool	Board::_checkWinDiagonalCheck(int x, int y){
 
 	int counter = 0;
-	eBlock playerPawn = _grid[y][x];
+	eBlock playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+
+	if (_grid[y][x] == playerPawn){ counter++; }
 
 	// Diagonal top right check
 	for (int i = 1; (x + i < GRID_SIZE) && (y - i >= 0); i++){
@@ -266,9 +282,11 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 			break ;
 	}
 
-	if (counter >= 4) { return true ; }
+	if (counter >= 5) { return true ; }
 
 	counter = 0;
+
+	if (_grid[y][x] == playerPawn){ counter++; }
 
 	// Diagonal bottom right check
 	for (int i = 1; (x + i < GRID_SIZE) && (y + i < GRID_SIZE); i++){
@@ -296,8 +314,6 @@ std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCapture(std::pair<int, int> index){
 	int x = index.first;
 	int y = index.second;
 
-	// return (_checkCaptureHorizontal(x, y) || _checkCaptureVertical(x, y) || _checkCaptureDiagonal(x, y));
-	// return _checkCaptureHorizontal(x, y);
 	std::pair<PAIR_INT, PAIR_INT> *ptr;
 	if ((ptr = _checkCaptureHorizontal(x, y)) != NULL)
 		return ptr;
@@ -521,6 +537,96 @@ void	Board::_updateCaptureScore(void){
 
 	// increment the score
 	captureScore += 2;
+
+	// Check if it's a win
+	if (captureScore >= 10) { throw std::string("win"); }
+}
+
+bool	Board::_checkEndingCapture(std::pair<int, int> index){
+
+	std::pair<PAIR_INT, PAIR_INT> *ptr;
+
+	// Get opponent block
+	eBlock opponent = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+	// int opponentScore = (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
+
+	// Iterate through grid
+	for (int j = 0; j < GRID_SIZE; j++){
+		for (int i = 0; i < GRID_SIZE; i++){
+
+			// If the case is empty
+			if (_grid[j][i] == eBlock::EMPTY){
+
+				// we set the case at this index to be the opponent (needed by _checkCapture)
+				_grid[j][i] = opponent;
+
+				// if there is possible capture we return true, the game continue
+				if ((ptr = _checkCapture(std::make_pair(i, j))) != NULL){
+
+					bool res = false;
+					if ((res = _checkIfCaptureBreaksAlignement(ptr, index))){
+						std::cout << "BREAKS 5 STONES" << std::endl;
+					}
+					else{
+
+						// get Opponent score
+						int score = (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
+
+						if (score >= 8) {
+							res = true;
+						}
+					}
+
+					// We set back the value at the index to empty
+					_grid[j][i] = eBlock::EMPTY;
+
+					// clean
+					delete ptr;
+
+					return res ;
+				}
+
+				// We set back the value at the index to empty
+				_grid[j][i] = eBlock::EMPTY;
+			}
+		}
+	}
+	return false ;
+}
+
+bool	Board::_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *captures, PAIR_INT last){
+
+	// Get the captured pairs
+	std::pair<int, int> a = (*captures).first;
+	std::pair<int, int> b = (*captures).second;
+
+	// Get captured's players's container
+	std::vector<std::pair<int, int>> & container = (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
+
+	// remove the pawn for the check
+	_removePawn(container, a);
+	_removePawn(container, b);
+
+	// check if it's a win, we want to return the opposite of the return value of checkWinm
+	bool res = !_checkWin(last);
+
+	// rollback
+	container.push_back(a);
+	container.push_back(b);
+
+	eBlock blockCurrentPlayer = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+	_grid[a.second][a.first] = blockCurrentPlayer;
+	_grid[b.second][b.first] = blockCurrentPlayer;
+
+	return res;
+}
+
+std::vector<std::pair<int, int>> & Board::_getCurrentPlayerPawns(void){
+	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
+}
+
+std::vector<std::pair<int, int>> & Board::_getOpponentPawns(void){
+	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
 }
 
 std::pair<int, int>	Board::_createEmptyPair(void){

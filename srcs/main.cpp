@@ -45,8 +45,7 @@ int main(void)
 			if (e.compare("quit") == 0){
 
 				std::cout << e << std::endl;
-				graphic.graph->close();
-				exit(EXIT_SUCCESS);
+				break ;
 			}
 			else if (e.compare("win") == 0){
 
@@ -55,7 +54,7 @@ int main(void)
 				eKeys k = graphic.graph->modalShow(winner);
 
 				// Exit the game
-				if (k != eKeys::R) { exit(EXIT_SUCCESS); }
+				if (k != eKeys::R) { break ; }
 
 				// Reset the game
 				board.reset(graphic.graph);
