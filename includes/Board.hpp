@@ -38,8 +38,9 @@ class Board{
 		void 								updateMap(void);
 		void 								move(void);
 		void 								handleKey(eKeys, IGraphicHandler *graph);
-		void 								drawPawns(std::vector<std::pair<int, int>>, eColor,IGraphicHandler *);
 		void 								draw(IGraphicHandler *graph);
+		void 								drawPawns(std::vector<std::pair<int, int>>, eColor,IGraphicHandler *);
+		void								drawForbiddenMoves(IGraphicHandler *);
 		void								reset(IGraphicHandler *);
 		eTurn								getTurn(void);
 
@@ -57,21 +58,24 @@ class Board{
 		bool								_checkWinVerticalCheck(int, int);
 		bool								_checkWinDiagonalCheck(int, int);
 
-		PAIR_INT							_createEmptyPair(void);
-
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCapture(std::pair<int, int>);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureHorizontal(int, int);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureVertical(int, int);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureDiagonal(int, int);
+
+		void								_checkDoubleThree(std::pair<int, int>);
+		void								_checkDoubleThreeVertical(int, int);
 
 		bool								_checkEndingCapture(std::pair<int, int>);
 		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
 
 		void								_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn);
 		void								_removePawnPair(PAIR_INT, PAIR_INT);
+		void								_removeAdjacentForbiddenMove(std::pair<int, int>, eBlock);
 
 		void								_updateTurn(IGraphicHandler *);
 		void								_updateCaptureScore(void);
+
 
 		int									_width;
 		int 								_height;

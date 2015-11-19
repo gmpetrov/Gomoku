@@ -96,6 +96,8 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		}
 
+		_checkDoubleThree(index);
+
 		// Update turn obviously
 		_updateTurn(graph);
 	}
@@ -123,10 +125,19 @@ void	Board::_initGrid(void){
 }
 
 bool	Board::_isCaseEmpty(std::pair<int, int> index){
-	return _grid[index.second][index.first] == eBlock::EMPTY;
+
+	eBlock	opponentForbbiden = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2_FORBIDDEN : eBlock::PLAYER_1_FORBIDDEN);
+
+	return _grid[index.second][index.first] == eBlock::EMPTY || _grid[index.second][index.first] == opponentForbbiden;
 }
 
 void	Board::_setMove(std::pair<int, int> index){
+
+	eBlock	opponentForbidden = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2_FORBIDDEN : eBlock::PLAYER_1_FORBIDDEN);
+
+	// if move is set on a opponent's forbidden move, remove adjacent opponent forbiddent moves
+	if (_grid[index.first][index.second] == opponentForbidden)
+		_removeAdjacentForbiddenMove(index, opponentForbidden);
 
 	// Update case value
 	_grid[index.second][index.first] = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
@@ -156,7 +167,22 @@ void 	Board::draw(IGraphicHandler *graph){
 	drawPawns(_pawnsPlayer1, eColor::PLAYER_1_COLOR, graph);
 	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
 
+	drawForbiddenMoves(graph);
+
 	graph->show();
+}
+
+void	Board::drawForbiddenMoves(IGraphicHandler *graph){
+
+	eBlock	forbidden = (_turn == eTurn::TURN_PLAYER_1 ? PLAYER_1_FORBIDDEN : PLAYER_2_FORBIDDEN);
+
+	for (int j = 0; j < GRID_SIZE; j++){
+		for (int i = 0; i < GRID_SIZE; i++){
+			if (_grid[j][i] == forbidden){
+				graph->drawPawn(i, j, eColor::PLAYER_FORBIDDEN);
+			}
+		}
+	}
 }
 
 /*
@@ -306,7 +332,7 @@ bool	Board::_checkWinDiagonalCheck(int x, int y){
 			break ;
 	}
 
-	return (counter >= 4);
+	return (counter >= 5);
 }
 
 std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCapture(std::pair<int, int> index){
@@ -340,7 +366,7 @@ std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureHorizontal(int x, int y){
 			_grid[y][x + 1] == opponentPawn &&
 			_grid[y][x + 2] == opponentPawn &&
 			_grid[y][x + 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -357,7 +383,7 @@ std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureHorizontal(int x, int y){
 			_grid[y][x - 1] == opponentPawn &&
 			_grid[y][x - 2] == opponentPawn &&
 			_grid[y][x - 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -386,7 +412,7 @@ std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureVertical(int x, int y){
 			_grid[y + 1][x] == opponentPawn &&
 			_grid[y + 2][x] == opponentPawn &&
 			_grid[y + 3][x] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -403,7 +429,7 @@ std::pair<PAIR_INT, PAIR_INT>	 *Board::_checkCaptureVertical(int x, int y){
 			_grid[y - 1][x] == opponentPawn &&
 			_grid[y - 2][x] == opponentPawn &&
 			_grid[y - 3][x] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -431,7 +457,7 @@ std::pair<PAIR_INT, PAIR_INT>  *	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y - 1][x + 1] == opponentPawn &&
 			_grid[y - 2][x + 2] == opponentPawn &&
 			_grid[y - 3][x + 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -449,7 +475,7 @@ std::pair<PAIR_INT, PAIR_INT>  *	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y + 1][x + 1] == opponentPawn &&
 			_grid[y + 2][x + 2] == opponentPawn &&
 			_grid[y + 3][x + 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -467,7 +493,7 @@ std::pair<PAIR_INT, PAIR_INT>  *	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y + 1][x - 1] == opponentPawn &&
 			_grid[y + 2][x - 2] == opponentPawn &&
 			_grid[y + 3][x - 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -485,7 +511,7 @@ std::pair<PAIR_INT, PAIR_INT>  *	Board::_checkCaptureDiagonal(int x, int y){
 			_grid[y - 1][x - 1] == opponentPawn &&
 			_grid[y - 2][x - 2] == opponentPawn &&
 			_grid[y - 3][x - 3] == playerPawn
-		   )
+			)
 		{
 
 			// Return the coordinates of the pawns
@@ -519,6 +545,21 @@ void	Board::_removePawnPair(PAIR_INT a, PAIR_INT b)
 	// Delete the pawns
 	_removePawn(container, a);
 	_removePawn(container, b);
+}
+
+void	Board::_removeAdjacentForbiddenMove(std::pair<int, int> index, eBlock forbiddenMove){
+
+	int	x = index.first;
+	int y = index.second;
+
+	if (y - 1 >= 0 && _grid[y - 1][x] == forbiddenMove)
+		_grid[y - 1][x] = eBlock::EMPTY;
+	else if (x + 1 < GRID_SIZE && _grid[y][x + 1] == forbiddenMove)
+		_grid[y][x + 1] = eBlock::EMPTY;
+	else if (y + 1 < GRID_SIZE && _grid[y + 1][x] == forbiddenMove)
+		_grid[y + 1][x] = eBlock::EMPTY;
+	else if (x - 1 >= 0 && _grid[y][x - 1] == forbiddenMove)
+		_grid[y][x - 1] = eBlock::EMPTY;
 }
 
 void	Board::_updateTurn(IGraphicHandler *graph){
@@ -572,6 +613,7 @@ bool	Board::_checkEndingCapture(std::pair<int, int> index){
 						// get Opponent score
 						int score = (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
 
+						// check if the opponent can win with this capture
 						if (score >= 8) {
 							res = true;
 						}
@@ -629,12 +671,73 @@ std::vector<std::pair<int, int>> & Board::_getOpponentPawns(void){
 	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
 }
 
-std::pair<int, int>	Board::_createEmptyPair(void){
-	return std::make_pair(-42, -42);
-}
-
 eTurn	Board::getTurn(){
 	return _turn;
+}
+
+void	Board::_checkDoubleThree(std::pair<int, int> index){
+	_checkDoubleThreeVertical(index.first, index.second);
+}
+
+void	Board::_checkDoubleThreeVertical(int x, int y){
+
+	// Get the pawn representing the current player
+	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+	// Get opponent pawn
+	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+
+	(void)opponentPawn;
+
+	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+
+	if (y - 2 > 0 && y + 1 < GRID_SIZE && _grid[y - 1][x] == playerPawn && _grid[y - 2][x] == eBlock::EMPTY){
+		// it's a possible three
+
+		if (y - 6 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x] == playerPawn && _grid[y - 5][x] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y - 2][x] = forbiddenMove;
+			_grid[y - 3][x] = forbiddenMove;
+		}
+		else if (y - 6 >= 0 && x - 4 >= 0 && _grid[y - 3][x - 1] == eBlock::EMPTY && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 3] == playerPawn && _grid[y - 6][x - 4] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y - 2][x] = forbiddenMove;
+		}
+		else if (y - 6 >= 0 && x + 4 < GRID_SIZE && _grid[y - 3][x + 1] == eBlock::EMPTY && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 3] == playerPawn && _grid[y - 6][x + 4] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y - 2][x] = forbiddenMove;
+		}
+
+	}
+	else if (y + 2 < GRID_SIZE && y - 1 >= 0 && _grid[y + 1][x] == playerPawn && _grid[y + 2][x] == eBlock::EMPTY){
+		// it's a possible three
+
+		if (y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x] == playerPawn && _grid[y + 5][x] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y + 2][x] = forbiddenMove;
+			_grid[y + 3][x] = forbiddenMove;
+		}
+		else if (y + 6 < GRID_SIZE && x - 4 >= 0 && _grid[y + 3][x - 1] == eBlock::EMPTY && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 3] == playerPawn && _grid[y + 6][x - 4] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y + 2][x] = forbiddenMove;
+		}
+		else if (y + 6 < GRID_SIZE && x + 4 >= 0 && _grid[y + 3][x + 1] == eBlock::EMPTY && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 3] == playerPawn && _grid[y + 6][x + 4] == eBlock::EMPTY){
+			// Possible double three
+
+			// Make further moves, that can lead to a double three, forbidden
+			_grid[y + 2][x] = forbiddenMove;
+		}
+	}
 }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
