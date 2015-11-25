@@ -65,6 +65,9 @@ class Board{
 
 		void								_checkDoubleThree(std::pair<int, int>);
 		void								_checkDoubleThreeVertical(int, int);
+		void								_checkDoubleThreeHorizontal(int, int);
+		void								_checkDoubleThreeDiagonalLeft(int, int);
+		void								_checkDoubleThreeDiagonalRight(int, int);
 
 		bool								_checkEndingCapture(std::pair<int, int>);
 		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
