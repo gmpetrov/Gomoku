@@ -675,349 +675,618 @@ eTurn	Board::getTurn(){
 	return _turn;
 }
 
+bool	Board::_isEmpty(int x, int y){
+	if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE)
+		return false;
+	return _grid[y][x] == eBlock::EMPTY;
+}
+
+void	Board::_swapInt(int  & a, int & b){
+	int tmp = a;
+
+	a = b;
+	b = tmp;
+}
+
+bool	Board::_isPlayerPawn(int x, int y){
+
+	// Get the pawn representing the current player
+	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+	if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE)
+		return false;
+	return _grid[y][x] == playerPawn;
+}
+
 void	Board::_checkDoubleThree(std::pair<int, int> index){
-	_checkDoubleThreeVertical(index.first, index.second);
-	_checkDoubleThreeHorizontal(index.first, index.second);
-	_checkDoubleThreeDiagonalLeft(index.first, index.second);
-	_checkDoubleThreeDiagonalRight(index.first, index.second);
-}
 
-void	Board::_checkDoubleThreeVertical(int x, int y){
+	int x = index.first;
+	int y = index.second;
 
 	// Get the pawn representing the current player
 	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
 
-	// Get opponent pawn
-	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+//  Looping to check all the possibilty around the given pawn
+//  [ ][ ][ ]
+//  [ ][][ ]
+//  [ ][ ][ ]
 
-	(void)opponentPawn;
+	for (int tmp_y = y - 1; tmp_y <= y + 1; tmp_y++){
+		for (int tmp_x = x - 1; tmp_x <= x + 1; tmp_x++){
 
-	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+			if (tmp_x == x && tmp_y == y)
+				continue ;
 
-	if (y - 1 >= 0 && y + 2 < GRID_SIZE && _grid[y - 1][x] == eBlock::EMPTY && _grid[y + 1][x] == playerPawn && _grid[y + 2][x] == eBlock::EMPTY){
-		if (y - 5 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x] == eBlock::EMPTY){
-			_grid[y - 1][x] = forbiddenMove;
-			_grid[y - 2][x] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(y - 5 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 3] == eBlock::EMPTY) ||
-			(y - 2 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 2][x + 2] == playerPawn && _grid[y - 2][x + 3] == eBlock::EMPTY) ||
-			(y - 2 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 1][x + 1] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y + 1][x + 3] == eBlock::EMPTY) ||
-			(y - 2 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 1][x - 1] == playerPawn && _grid[y - 2][x - 2] == playerPawn && _grid[y - 3][x - 3] == eBlock::EMPTY) ||
-			(y - 2 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 2][x - 2] == playerPawn && _grid[y - 2][x - 3] == eBlock::EMPTY) ||
-			(y - 5 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 3] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 2][x] = forbiddenMove;
-			return ;
-		}
-		else if (y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x] == playerPawn && _grid[y + 5][x] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY){
-			_grid[y + 2][x] = forbiddenMove;
-			_grid[y + 3][x] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 1][x + 2] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 3][x + 2] == playerPawn && _grid[y + 3][x + 3] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x + 1] == playerPawn && _grid[y + 5][x + 2] == playerPawn && _grid[y + 6][x + 3] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x - 1] == playerPawn && _grid[y + 5][x - 2] == playerPawn && _grid[y + 6][x - 3] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 3][x - 2] == playerPawn && _grid[y + 3][x - 3] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 1][x - 2] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 3][x] = forbiddenMove;
-			return ;
-		}
-	}
+			// Checking if we are out of bounds and if the position point to a player pawn
+			if (tmp_x < GRID_SIZE && tmp_x >= 0 && tmp_y < GRID_SIZE && tmp_y >= 0 && _grid[tmp_y][tmp_x] == playerPawn){
 
-	if (y + 1 < GRID_SIZE && y - 2 >= 0 && _grid[y + 1][x] == eBlock::EMPTY && _grid[y - 1][x] == playerPawn && _grid[y - 2][x] == eBlock::EMPTY){
-		if (y - 6 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x] == playerPawn && _grid[y - 5][x] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY){
-			_grid[y - 2][x] = forbiddenMove;
-			_grid[y - 3][x] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(y - 6 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x + 1] == playerPawn && _grid[y - 5][x + 2] == playerPawn && _grid[y - 6][x + 3] == eBlock::EMPTY) ||
-			(y - 3 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 3][x + 2] == playerPawn && _grid[y - 3][x + 3] == eBlock::EMPTY) ||
-			(y - 3 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 1][x + 2] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
-			(y - 3 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 1][x - 2] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
-			(y - 3 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 3][x - 2] == playerPawn && _grid[y - 3][x - 3] == eBlock::EMPTY) ||
-			(y - 6 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x - 1] == playerPawn && _grid[y - 5][x - 2] == playerPawn && _grid[y - 6][x - 3] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 3][x] = forbiddenMove;
-			return ;
-		}
-		else if (y + 5 < GRID_SIZE && _grid[y + 5][x] == eBlock::EMPTY && _grid[y + 4][x] == playerPawn && _grid[y + 3][x] == playerPawn && _grid[y + 2][x] == eBlock::EMPTY){
-			_grid[y + 1][x] = forbiddenMove;
-			_grid[y + 2][x] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(y + 2 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 1][x + 1] == playerPawn && _grid[y][x + 1] == playerPawn && _grid[y - 1][x + 3] == eBlock::EMPTY) ||
-			(y + 2 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 2][x + 2] == playerPawn && _grid[y + 2][x + 3] == eBlock::EMPTY) ||
-			(y + 5 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 3] == eBlock::EMPTY) ||
-			(y + 5 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 3] == eBlock::EMPTY) ||
-			(y + 2 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 2][x - 2] == playerPawn && _grid[y + 2][x - 3] == eBlock::EMPTY) ||
-			(y + 2 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 1][x - 1] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y - 1][x - 3] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 2][x] = forbiddenMove;
-			return ;
-		}
-	}
-
-}
-
-void	Board::_checkDoubleThreeHorizontal(int x, int y){
-	// Get the pawn representing the current player
-	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
-
-	// Get opponent pawn
-	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
-
-	(void)opponentPawn;
-
-	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
-
-	if (x - 1 >= 0 && x + 2 < GRID_SIZE && _grid[y][x - 1] == eBlock::EMPTY && _grid[y][x + 1] == playerPawn && _grid[y][x + 2] == eBlock::EMPTY){
-
-		if (x - 5 >= 0 && _grid[y][x - 2] == eBlock::EMPTY && _grid[y][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y][x - 5] == eBlock::EMPTY){
-			_grid[y][x - 1] = forbiddenMove;
-			_grid[y][x - 2] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x - 5 >= 0 && y - 4 >= 0 && _grid[y - 1][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 3][x - 4] == playerPawn && _grid[y - 4][x - 5] == eBlock::EMPTY) ||
-			(x - 5 >= 0 && y + 4 < GRID_SIZE && _grid[y + 1][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 3][x - 4] == playerPawn && _grid[y + 4][x - 5] == eBlock::EMPTY)
-			)
-		{
-			_grid[y][x - 1] = forbiddenMove;
-			return ;
-		}
-		else if (x + 6 < GRID_SIZE && _grid[y][x + 3] == eBlock::EMPTY && _grid[y][x + 4] == playerPawn && _grid[y][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY){
-			_grid[y][x + 2] = forbiddenMove;
-			_grid[y][x + 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 6 < GRID_SIZE && y - 4 >= 0 && _grid[y - 1][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 4] == playerPawn && _grid[y - 3][x + 5] == playerPawn && _grid[y - 4][x + 6] == eBlock::EMPTY) ||
-			(x + 6 < GRID_SIZE && y + 4 < GRID_SIZE && _grid[y + 1][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 4] == playerPawn && _grid[y + 3][x + 5] == playerPawn && _grid[y + 4][x + 6] == eBlock::EMPTY)
-			)
-		{
-			_grid[y][x + 2] = forbiddenMove;
-			return ;
-		}
-
-	}
-	if (x - 2 >= 0 && x + 1 < GRID_SIZE && _grid[y][x - 2] == eBlock::EMPTY && _grid[y][x - 1] == playerPawn && _grid[y][x + 1] == eBlock::EMPTY){
-		if (x - 6 >= 0 && _grid[y][x - 3] == eBlock::EMPTY && _grid[y][x - 4] == playerPawn && _grid[y][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY){
-			_grid[y][x - 2] = forbiddenMove;
-			_grid[y][x - 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x - 6 >= 0 && y - 4 >= 0 && _grid[y - 1][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 4] == playerPawn && _grid[y - 3][x - 5] == playerPawn && _grid[y - 4][x - 6] == eBlock::EMPTY) ||
-			(x - 6 >= 0 && y + 4 < GRID_SIZE && _grid[y + 1][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 4] == playerPawn && _grid[y + 3][x - 5] == playerPawn && _grid[y + 4][x - 6] == eBlock::EMPTY)
-			)
-		{
-			_grid[y][x - 2] = forbiddenMove;
-			return ;
-		}
-		else if (x + 5 < GRID_SIZE && _grid[y][x + 2] == eBlock::EMPTY && _grid[y][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y][x + 5] == eBlock::EMPTY){
-			_grid[y][x + 1] = forbiddenMove;
-			_grid[y][x + 2] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 5 < GRID_SIZE && y - 4 >= 0 && _grid[y - 1][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 3][x + 4] == playerPawn && _grid[y - 4][x + 5] == eBlock::EMPTY) ||
-			(x + 5 < GRID_SIZE && y + 4 < GRID_SIZE && _grid[y + 1][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 4][x + 5] == eBlock::EMPTY)
-			)
-		{
-			_grid[y][x + 1] = forbiddenMove;
-			return ;
-		}
-	}
-
-}
-
-void	Board::_checkDoubleThreeDiagonalLeft(int x, int y){
-
-	// Get the pawn representing the current player
-	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
-
-	// Get opponent pawn
-	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
-
-	(void)opponentPawn;
-
-	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
-
-	if (x - 1 >= 0 && y - 1 >= 0 && x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y - 1][x - 1] == eBlock::EMPTY && _grid[y + 1][x + 1] == playerPawn && _grid[y + 2][x + 2] == eBlock::EMPTY){
-		if (x - 5 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 3] == playerPawn && _grid[y - 4][x - 4] == playerPawn && _grid[y - 5][x - 5] == eBlock::EMPTY){
-			_grid[y - 1][x - 1] = forbiddenMove;
-			_grid[y - 2][x - 2] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x - 2 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 2] == playerPawn && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 2] == eBlock::EMPTY) ||
-			(x - 2 >= 0 && y + 1 < GRID_SIZE && _grid[y - 2][x- 2] == eBlock::EMPTY && _grid[y - 1][x - 2] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y + 1][x - 2] == eBlock::EMPTY) ||
-			(x - 5 >= 0 && y - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 2][x - 4] == playerPawn && _grid[y - 3][x - 5] == eBlock::EMPTY) ||
-			(y - 2 >= 0 && x - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 2][x] == playerPawn && _grid[y - 2][x + 1] == eBlock::EMPTY) ||
-			(x - 5 >= 0 && y - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 1][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y + 1][x - 5] == eBlock::EMPTY) ||
-			(x - 2 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x + 1] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 2][x - 2] = forbiddenMove;
-			return ;
-		}
-		else if (x + 6 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == playerPawn && _grid[y + 6][x + 6] == eBlock::EMPTY){
-			_grid[y + 2][x + 2] = forbiddenMove;
-			_grid[y + 3][x + 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 1][x + 3] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
-			(x + 6 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 4] == playerPawn && _grid[y + 1][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY) ||
-			(x + 6 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 3][x + 4] == playerPawn && _grid[y + 3][x + 5] == playerPawn && _grid[y + 3][x + 6] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 3] == playerPawn && _grid[y + 5][x + 3] == playerPawn && _grid[y + 6][x + 3] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 1] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 3][x + 2] == playerPawn && _grid[y + 3][x + 1] == playerPawn && _grid[y + 3][x] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 3][x + 3] = forbiddenMove;
-			return ;
-		}
-	}
-
-	if (x - 2 >= 0 && y - 2 >= 0 && x + 1 < GRID_SIZE && y + 1 < GRID_SIZE && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 1][x - 1] == playerPawn && _grid[y + 1][x + 1] == eBlock::EMPTY){
-
-		if (x - 6 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 4] == playerPawn && _grid[y - 5][x - 5] == playerPawn && _grid[y - 6][x - 6] == eBlock::EMPTY){
-			_grid[y - 2][x - 2] = forbiddenMove;
-			_grid[y - 3][x - 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x - 3 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 3] == playerPawn && _grid[y - 5][x - 3] == playerPawn && _grid[y - 6][x - 3] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 1] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 3][x - 2] == playerPawn && _grid[y - 3][x - 1] == playerPawn && _grid[y - 3][x] == eBlock::EMPTY) ||
-			(x - 3 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 1][x - 3] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
-			(x - 6 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 4] == playerPawn && _grid[y - 1][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY) ||
-			(x - 6 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 3][x - 4] == playerPawn && _grid[y - 3][x - 5] == playerPawn && _grid[y - 3][x - 6] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 3][x - 3] = forbiddenMove;
-			return ;
-		}
-		else if (x + 5 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == eBlock::EMPTY){
-			_grid[y + 1][x + 1];
-			_grid[y + 2][x + 2];
-			return ;
-		}
-		else if (
-			(x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 1][x + 2] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y - 1][x + 2] == eBlock::EMPTY) ||
-			(x + 5 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 1][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y - 1][x + 5] == eBlock::EMPTY) ||
-			(x + 5 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 2][x + 4] == playerPawn && _grid[y + 2][x + 5] == eBlock::EMPTY) ||
-			(x + 2 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 2] == playerPawn && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 2] == eBlock::EMPTY)	||
-			(x + 2 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 4][x] == playerPawn && _grid[y + 5][x - 1] == eBlock::EMPTY) ||
-			(x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 2][x] == playerPawn && _grid[y + 2][x - 1] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 2][x + 2];
-			return ;
-		}
-
-	}
-
-}
-
-void	Board::_checkDoubleThreeDiagonalRight(int x, int y){
-	// Get the pawn representing the current player
-	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
-
-	// Get opponent pawn
-	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
-
-	(void)opponentPawn;
-
-	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
-
-	if (x - 2 >= 0 && y - 1 >= 0 &&  x  + 1 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y - 1][x + 1] == eBlock::EMPTY && _grid[y + 1][x - 1] == playerPawn && _grid[y - 1][x - 2] == eBlock::EMPTY){
-
-		if (x + 5 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 3] == playerPawn && _grid[y - 4][x + 4] == playerPawn && _grid[y - 5][x + 5] == eBlock::EMPTY){
-			_grid[y - 1][x + 1] = forbiddenMove;
-			_grid[y - 2][x + 2] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 2 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 2] == playerPawn && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 2] == eBlock::EMPTY) ||
-			(x + 5 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 2][x + 4] == playerPawn && _grid[y - 2][x + 5] == eBlock::EMPTY) ||
-			(x + 5 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 1][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y - 1][x + 5] == eBlock::EMPTY) ||
-			(x + 2 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 1][x + 2] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y + 1][x + 2] == eBlock::EMPTY) ||
-			(x + 2 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 2][x] == playerPawn && _grid[y - 2][x - 1] == eBlock::EMPTY) ||
-			(x + 2 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x - 1] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 2][x + 2] = forbiddenMove;
-			return ;
-		}
-		else if (x - 6 >= 0 && y + 6 < GRID_SIZE && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 4] == playerPawn && _grid[y + 5][x - 5] == playerPawn && _grid[y + 6][x - 6] == eBlock::EMPTY){
-			_grid[y + 2][x - 2] = forbiddenMove;
-			_grid[y + 3][x - 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(y + 3 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 1][x - 3] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
-			(y + 3 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 3][x - 2] == playerPawn && _grid[y + 3][x - 1] == playerPawn && _grid[y + 3][x] == eBlock::EMPTY) ||
-			(y + 6 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 1] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY) ||
-			(y + 6 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 3] == playerPawn && _grid[y + 5][x - 3] == playerPawn && _grid[y + 6][x - 3] == eBlock::EMPTY) ||
-			(y + 3 < GRID_SIZE && x - 6 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 3][x - 4] == playerPawn && _grid[y + 3][x - 5] == playerPawn && _grid[y + 3][x - 6] == eBlock::EMPTY) ||
-			(y + 3 < GRID_SIZE && x - 6 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 4] == playerPawn && _grid[y + 1][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 3][x - 3] = forbiddenMove;
-			return ;
-		}
-
-	}
-
-	if (x - 1 >= 0 && y - 2 >= 0 && x + 2 < GRID_SIZE && y + 1 < GRID_SIZE && _grid[y + 1][x - 1] == eBlock::EMPTY && _grid[y - 1][x + 1] == playerPawn && _grid[y - 2][x + 2] == eBlock::EMPTY){
-		if (x + 6 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 4] == playerPawn && _grid[y - 5][x + 5] == playerPawn && _grid[x - 6][y + 6] == eBlock::EMPTY){
-			_grid[y - 2][x + 2] = forbiddenMove;
-			_grid[y - 3][x + 3] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x + 3 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 3] == playerPawn && _grid[y - 5][x + 3] == playerPawn && _grid[y - 6][x + 3] == eBlock::EMPTY) ||
-			(x + 6 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 3][x + 4] == playerPawn && _grid[y - 3][x + 5] == playerPawn && _grid[y - 3][x + 6] == eBlock::EMPTY) ||
-			(x + 6 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 4] == playerPawn && _grid[y - 1][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 1][x + 3] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
-			(x + 3 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 1] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY)
-			)
-		{
-			_grid[y - 3][x + 3] = forbiddenMove;
-			return ;
-		}
-		else if (x - 5 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == eBlock::EMPTY){
-			_grid[y + 1][x - 1] = forbiddenMove;
-			_grid[y + 2][x - 2] = forbiddenMove;
-			return ;
-		}
-		else if (
-			(x - 2 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 1][x - 2] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y - 1][x + 2] == eBlock::EMPTY) ||
-			(x - 2 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 2][x] == playerPawn && _grid[y + 2][x - 1] == eBlock::EMPTY) ||
-			(x - 2 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 4][x] == playerPawn && _grid[y + 5][x - 1] == eBlock::EMPTY) ||
-			(x - 2 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 2] == playerPawn && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 2] == eBlock::EMPTY) ||
-			(x - 5 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 2][x - 4] == playerPawn && _grid[y + 2][x - 5] == eBlock::EMPTY) ||
-			(x - 5 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 1][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y - 1][x - 5] == eBlock::EMPTY)
-			)
-		{
-			_grid[y + 2][x - 2] = forbiddenMove;
-			return ;
+					// Checking if it's a possible three
+					if (_checkIfThree(index, std::make_pair(tmp_x, tmp_y))){
+						_checkIfDoubleThree(index, std::make_pair(tmp_x, tmp_y));
+					}
+			}
 		}
 	}
 }
+
+void	Board::_checkIfDoubleThree(std::pair<int, int> a, std::pair<int, int> b){
+
+	int x1 = a.first;
+	int y1 = a.second;
+	int x2 = b.first;
+	int y2 = b.second;
+	std::pair<PAIR_INT, PAIR_INT> *ptr;
+
+	if (x1 == x2 && y1 != y2){
+		// It's a vertical alignement
+
+		if (y2 < y1)
+			_swapInt(y1, y2);
+
+		// [ ][ ][ ]
+		// [ ][ ][ ]
+		//     o  (x1, y1)
+		//     o  (x2, y2)
+		// [ ][ ][ ]
+		// [ ][ ][ ]
+
+		std::pair<int, int> top_blank = std::make_pair(x1, y1 - 1);
+		std::pair<int, int> top_pawn  = std::make_pair(x1, y1);
+
+
+		std::pair<int, int> bottom_blank = std::make_pair(x2, y2 + 1);
+		std::pair<int, int> bottom_pawn  = std::make_pair(x2, y2);
+
+		if ((ptr = _doubleThreeAllCaseChecker(top_blank, top_pawn))){
+
+			delete ptr;
+		}
+
+		if ((ptr = _doubleThreeAllCaseChecker(bottom_blank, bottom_pawn))){
+
+			delete ptr;
+		}
+	}
+	else if (x1 != x2 && y1 == y2){
+		// Horizontal alignement
+
+		if (x2 < x1)
+			_swapInt(x1, x2);
+
+		// [ ][ ][ ][ ]
+		// [ ][ ][ ][ ]
+		// [ ][o][o][ ]
+		// [ ][ ][ ][ ]
+		// [ ][ ][ ][ ]
+
+		std::pair<int, int> left_blank = std::make_pair(x1 - 1, y1);
+		std::pair<int, int> left_pawn  = std::make_pair(x1, y1);
+
+		std::pair<int, int> right_blank = std::make_pair(x2 + 1, y2);
+		std::pair<int, int> right_pawn  = std::make_pair(x2, y2);
+
+		if ((ptr = _doubleThreeAllCaseChecker(left_blank, left_pawn))){
+			delete ptr;
+		}
+
+		if ((ptr = _doubleThreeAllCaseChecker(right_blank, right_pawn))){
+			delete ptr;
+		}
+	}
+	else if (x1 != x2 && y1 != y2){
+		// Diagonal alignement
+
+		if ((x1 < x2 && y1 < y2) || (x2 < x1 && y2 < y1)){
+			//  o
+			//	  o
+
+			if ((x2 < x1 && y2 < y1)){
+				_swapInt(x1, x2);
+				_swapInt(y1, y2);
+			}
+
+			std::pair<int, int> top_blank = std::make_pair(x1 - 1, y1 - 1);
+			std::pair<int, int> top_pawn  = std::make_pair(x1, y1);
+
+			std::pair<int, int> bottom_blank = std::make_pair(x2 + 1, y2 + 1);
+			std::pair<int, int> bottom_pawn  = std::make_pair(x2, y2);
+
+			if ((ptr = _doubleThreeAllCaseChecker(top_blank, top_pawn))){
+				std::cout << "DIAGONAL TOP 1" << std::endl;
+				delete ptr;
+			}
+
+			if ((ptr = _doubleThreeAllCaseChecker(bottom_blank, bottom_pawn))){
+				std::cout << "DIAGONAL TOP 1" << std::endl;
+				delete ptr;
+			}
+
+		}
+		else if ((x1 > x2 && y1 < y2) || (x2 > x1 && y2 < y1)){
+
+			//    o
+			//  o
+
+			if ((x2 > x1 && y2 < y1)){
+				_swapInt(x1, x2);
+				_swapInt(y1, y2);
+			}
+
+			std::pair<int, int> top_blank = std::make_pair(x1 + 1, y1 - 1);
+			std::pair<int, int> top_pawn  = std::make_pair(x1, y1);
+
+			std::pair<int, int> bottom_blank = std::make_pair(x2 - 1, y2 + 1);
+			std::pair<int, int> bottom_pawn  = std::make_pair(x2, y2);
+
+			if ((ptr = _doubleThreeAllCaseChecker(top_blank, top_pawn))){
+				std::cout << "DIAGONAL TOP 2" << std::endl;
+				delete ptr;
+			}
+
+			if ((ptr = _doubleThreeAllCaseChecker(bottom_blank, bottom_pawn))){
+				std::cout << "DIAGONAL BOTTOM 2" << std::endl;
+				delete ptr;
+			}
+
+		}
+	}
+}
+
+std::pair<PAIR_INT, PAIR_INT>		*Board::_doubleThreeAllCaseChecker(std::pair<int, int> blank, std::pair<int, int> pawn){
+
+	int blank_x = blank.first;
+	int blank_y = blank.second;
+	int pawn_x  = pawn.first;
+	int pawn_y  = pawn.second;
+
+	for (int tmp_y = blank_y - 1; tmp_y <= blank_y + 1; tmp_y++){
+		for (int tmp_x = blank_x - 1; tmp_x <= blank_x + 1; tmp_x++){
+
+			if ((tmp_x == pawn_x && tmp_y == pawn_y) || (tmp_x == blank_x && tmp_y == blank_y))
+				continue ;
+
+			// Compute the deltas
+			int delta_x = tmp_x - blank_x;
+			int delta_y = tmp_y - blank_y;
+
+			std::pair<int, int> a = std::make_pair(blank_x + (2 * delta_x), blank_y + (2 * delta_y));
+			std::pair<int, int> b = std::make_pair(blank_x + (3 * delta_x), blank_y + (3 * delta_y));
+
+			if (_checkIfThree(a, b)){
+				return new std::pair<PAIR_INT, PAIR_INT>(a, b);
+			}
+		}
+	}
+	return NULL;
+}
+
+bool	Board::_checkIfThree(std::pair<int, int> a, std::pair<int, int> b){
+
+	int x1 = a.first;
+	int y1 = a.second;
+	int x2 = b.first;
+	int y2 = b.second;
+
+	if (!_isPlayerPawn(x1, y1) || !_isPlayerPawn(x2, y2))
+		return false;
+
+	if (x1 == x2 && y1 != y2){
+		// It's a vertical alignement
+
+		if (y2 < y1)
+			_swapInt(y1, y2);
+
+		if (y1 - 1 >= 0 && y2 + 1 < GRID_SIZE && _isEmpty(x1, y1 - 1) && _isEmpty(x1, y2 + 1))
+			return true;
+
+	}
+	else if (x1 != x2 && y1 == y2){
+		// Horizontal alignement
+
+		if (x2 < x1)
+			_swapInt(x1, x2);
+
+		if (x1 - 1 >= 0 && x2 + 1 < GRID_SIZE && _isEmpty(x1 - 1, y1) && _isEmpty(x2 + 1, y2))
+			return true;
+	}
+	else if (x1 != x2 && y1 != y2){
+		// Diagonal alignement
+
+		if ((x1 < x2 && y1 < y2) || (x2 < x1 && y2 < y1)){
+			//  o
+			//	  o
+
+			if ((x2 < x1 && y2 < y1)){
+				_swapInt(x1, x2);
+				_swapInt(y1, y2);
+			}
+
+			if (x1 - 1 >= 0 && y1 - 1 >= 0 && x2 + 1 < GRID_SIZE && y2 + 1 < GRID_SIZE && _isEmpty(x1 - 1, y1 - 1) && _isEmpty(x2 + 1, y2 + 1))
+				return true;
+		}
+		else if ((x1 > x2 && y1 < y2) || (x2 > x1 && y2 < y1)){
+
+			//    o
+			//  o
+
+			if ((x2 > x1 && y2 < y1)){
+				_swapInt(x1, x2);
+				_swapInt(y1, y2);
+			}
+
+			if (x1 + 1 < GRID_SIZE && y1 - 1 >= 0 && x2 - 1 >= 0 && y2 + 1 < GRID_SIZE && _isEmpty(x1 + 1, y1 - 1) && _isEmpty(x2 - 1, y2 + 1))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+// void	Board::_checkDoubleThreeVertical(std::pair<int, int> index){
+
+// }
+// void	Board::_checkDoubleThreeVertical(int x, int y){
+
+// 	// Get the pawn representing the current player
+// 	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+// 	// Get opponent pawn
+// 	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+
+// 	(void)opponentPawn;
+
+// 	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+
+// 	if (y - 1 >= 0 && y + 2 < GRID_SIZE && _grid[y - 1][x] == eBlock::EMPTY && _grid[y + 1][x] == playerPawn && _grid[y + 2][x] == eBlock::EMPTY){
+
+// 		std::cout << "POSSIBLE THREE" << std::endl;
+
+// 		if (y - 5 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x] == eBlock::EMPTY){
+// 			_grid[y - 1][x] = forbiddenMove;
+// 			_grid[y - 2][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(y - 5 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 3] == eBlock::EMPTY) ||
+// 			(y - 2 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 2][x + 2] == playerPawn && _grid[y - 2][x + 3] == eBlock::EMPTY) ||
+// 			(y - 2 >= 0 && x + 3 < GRID_SIZE && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 1][x + 1] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y + 1][x + 3] == eBlock::EMPTY) ||
+// 			(y - 2 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 1][x - 1] == playerPawn && _grid[y - 2][x - 2] == playerPawn && _grid[y - 3][x - 3] == eBlock::EMPTY) ||
+// 			(y - 2 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 2][x - 2] == playerPawn && _grid[y - 2][x - 3] == eBlock::EMPTY) ||
+// 			(y - 5 >= 0 && x - 3 >= 0 && _grid[y - 2][x] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 3] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 2][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x] == playerPawn && _grid[y + 5][x] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY){
+// 			_grid[y + 2][x] = forbiddenMove;
+// 			_grid[y + 3][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 1][x + 2] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 3][x + 2] == playerPawn && _grid[y + 3][x + 3] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x + 1] == playerPawn && _grid[y + 5][x + 2] == playerPawn && _grid[y + 6][x + 3] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y + 6 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 4][x - 1] == playerPawn && _grid[y + 5][x - 2] == playerPawn && _grid[y + 6][x - 3] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 3][x - 2] == playerPawn && _grid[y + 3][x - 3] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y + 3 < GRID_SIZE && _grid[y + 3][x] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 1][x - 2] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 3][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 	}
+
+// 	if (y + 1 < GRID_SIZE && y - 2 >= 0 && _grid[y + 1][x] == eBlock::EMPTY && _grid[y - 1][x] == playerPawn && _grid[y - 2][x] == eBlock::EMPTY){
+
+// 		std::cout << "POSSIBLE THREE 2" << std::endl;
+
+// 		if (y - 6 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x] == playerPawn && _grid[y - 5][x] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY){
+// 			_grid[y - 2][x] = forbiddenMove;
+// 			_grid[y - 3][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(y - 6 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x + 1] == playerPawn && _grid[y - 5][x + 2] == playerPawn && _grid[y - 6][x + 3] == eBlock::EMPTY) ||
+// 			(y - 3 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 3][x + 2] == playerPawn && _grid[y - 3][x + 3] == eBlock::EMPTY) ||
+// 			(y - 3 >= 0 && x + 3 < GRID_SIZE && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 1][x + 2] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
+// 			(y - 3 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 1][x - 2] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
+// 			(y - 3 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 3][x - 2] == playerPawn && _grid[y - 3][x - 3] == eBlock::EMPTY) ||
+// 			(y - 6 >= 0 && x - 3 >= 0 && _grid[y - 3][x] == eBlock::EMPTY && _grid[y - 4][x - 1] == playerPawn && _grid[y - 5][x - 2] == playerPawn && _grid[y - 6][x - 3] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 3][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (y + 5 < GRID_SIZE && _grid[y + 5][x] == eBlock::EMPTY && _grid[y + 4][x] == playerPawn && _grid[y + 3][x] == playerPawn && _grid[y + 2][x] == eBlock::EMPTY){
+// 			_grid[y + 1][x] = forbiddenMove;
+// 			_grid[y + 2][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(y + 2 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 1][x + 1] == playerPawn && _grid[y][x + 1] == playerPawn && _grid[y - 1][x + 3] == eBlock::EMPTY) ||
+// 			(y + 2 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 2][x + 2] == playerPawn && _grid[y + 2][x + 3] == eBlock::EMPTY) ||
+// 			(y + 5 < GRID_SIZE && x + 3 < GRID_SIZE && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 3] == eBlock::EMPTY) ||
+// 			(y + 5 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 3] == eBlock::EMPTY) ||
+// 			(y + 2 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 2][x - 2] == playerPawn && _grid[y + 2][x - 3] == eBlock::EMPTY) ||
+// 			(y + 2 < GRID_SIZE && x - 3 >= 0 && _grid[y + 2][x] == eBlock::EMPTY && _grid[y + 1][x - 1] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y - 1][x - 3] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 2][x] = forbiddenMove;
+// 			return ;
+// 		}
+// 	}
+
+// }
+
+// void	Board::_checkDoubleThreeHorizontal(int x, int y){
+// 	// Get the pawn representing the current player
+// 	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+// 	// Get opponent pawn
+// 	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+
+// 	(void)opponentPawn;
+
+// 	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+
+// 	if (x - 1 >= 0 && x + 2 < GRID_SIZE && _grid[y][x - 1] == eBlock::EMPTY && _grid[y][x + 1] == playerPawn && _grid[y][x + 2] == eBlock::EMPTY){
+
+// 		if (x - 5 >= 0 && _grid[y][x - 2] == eBlock::EMPTY && _grid[y][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y][x - 5] == eBlock::EMPTY){
+// 			_grid[y][x - 1] = forbiddenMove;
+// 			_grid[y][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x - 5 >= 0 && y - 4 >= 0 && _grid[y - 1][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 3][x - 4] == playerPawn && _grid[y - 4][x - 5] == eBlock::EMPTY) ||
+// 			(x - 5 >= 0 && y + 4 < GRID_SIZE && _grid[y + 1][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 3][x - 4] == playerPawn && _grid[y + 4][x - 5] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y][x - 1] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x + 6 < GRID_SIZE && _grid[y][x + 3] == eBlock::EMPTY && _grid[y][x + 4] == playerPawn && _grid[y][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY){
+// 			_grid[y][x + 2] = forbiddenMove;
+// 			_grid[y][x + 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 6 < GRID_SIZE && y - 4 >= 0 && _grid[y - 1][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 4] == playerPawn && _grid[y - 3][x + 5] == playerPawn && _grid[y - 4][x + 6] == eBlock::EMPTY) ||
+// 			(x + 6 < GRID_SIZE && y + 4 < GRID_SIZE && _grid[y + 1][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 4] == playerPawn && _grid[y + 3][x + 5] == playerPawn && _grid[y + 4][x + 6] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y][x + 2] = forbiddenMove;
+// 			return ;
+// 		}
+
+// 	}
+// 	if (x - 2 >= 0 && x + 1 < GRID_SIZE && _grid[y][x - 2] == eBlock::EMPTY && _grid[y][x - 1] == playerPawn && _grid[y][x + 1] == eBlock::EMPTY){
+// 		if (x - 6 >= 0 && _grid[y][x - 3] == eBlock::EMPTY && _grid[y][x - 4] == playerPawn && _grid[y][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY){
+// 			_grid[y][x - 2] = forbiddenMove;
+// 			_grid[y][x - 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x - 6 >= 0 && y - 4 >= 0 && _grid[y - 1][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 4] == playerPawn && _grid[y - 3][x - 5] == playerPawn && _grid[y - 4][x - 6] == eBlock::EMPTY) ||
+// 			(x - 6 >= 0 && y + 4 < GRID_SIZE && _grid[y + 1][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 4] == playerPawn && _grid[y + 3][x - 5] == playerPawn && _grid[y + 4][x - 6] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x + 5 < GRID_SIZE && _grid[y][x + 2] == eBlock::EMPTY && _grid[y][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y][x + 5] == eBlock::EMPTY){
+// 			_grid[y][x + 1] = forbiddenMove;
+// 			_grid[y][x + 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 5 < GRID_SIZE && y - 4 >= 0 && _grid[y - 1][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 3][x + 4] == playerPawn && _grid[y - 4][x + 5] == eBlock::EMPTY) ||
+// 			(x + 5 < GRID_SIZE && y + 4 < GRID_SIZE && _grid[y + 1][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 4][x + 5] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y][x + 1] = forbiddenMove;
+// 			return ;
+// 		}
+// 	}
+
+// }
+
+// void	Board::_checkDoubleThreeDiagonalLeft(int x, int y){
+
+// 	// Get the pawn representing the current player
+// 	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+// 	// Get opponent pawn
+// 	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+
+// 	(void)opponentPawn;
+
+// 	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+
+// 	if (x - 1 >= 0 && y - 1 >= 0 && x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y - 1][x - 1] == eBlock::EMPTY && _grid[y + 1][x + 1] == playerPawn && _grid[y + 2][x + 2] == eBlock::EMPTY){
+// 		if (x - 5 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 3] == playerPawn && _grid[y - 4][x - 4] == playerPawn && _grid[y - 5][x - 5] == eBlock::EMPTY){
+// 			_grid[y - 1][x - 1] = forbiddenMove;
+// 			_grid[y - 2][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x - 2 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 2] == playerPawn && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 2] == eBlock::EMPTY) ||
+// 			(x - 2 >= 0 && y + 1 < GRID_SIZE && _grid[y - 2][x- 2] == eBlock::EMPTY && _grid[y - 1][x - 2] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y + 1][x - 2] == eBlock::EMPTY) ||
+// 			(x - 5 >= 0 && y - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 2][x - 4] == playerPawn && _grid[y - 3][x - 5] == eBlock::EMPTY) ||
+// 			(y - 2 >= 0 && x - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 2][x - 1] == playerPawn && _grid[y - 2][x] == playerPawn && _grid[y - 2][x + 1] == eBlock::EMPTY) ||
+// 			(x - 5 >= 0 && y - 2 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 1][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y + 1][x - 5] == eBlock::EMPTY) ||
+// 			(x - 2 >= 0 && y - 5 >= 0 && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 3][x - 1] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x + 1] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 2][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x + 6 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == playerPawn && _grid[y + 6][x + 6] == eBlock::EMPTY){
+// 			_grid[y + 2][x + 2] = forbiddenMove;
+// 			_grid[y + 3][x + 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 1][x + 3] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
+// 			(x + 6 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 2][x + 4] == playerPawn && _grid[y + 1][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY) ||
+// 			(x + 6 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 3][x + 4] == playerPawn && _grid[y + 3][x + 5] == playerPawn && _grid[y + 3][x + 6] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 3] == playerPawn && _grid[y + 5][x + 3] == playerPawn && _grid[y + 6][x + 3] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y + 6 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 1] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y + 3 < GRID_SIZE && _grid[y + 3][x + 3] == eBlock::EMPTY && _grid[y + 3][x + 2] == playerPawn && _grid[y + 3][x + 1] == playerPawn && _grid[y + 3][x] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 3][x + 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 	}
+
+// 	if (x - 2 >= 0 && y - 2 >= 0 && x + 1 < GRID_SIZE && y + 1 < GRID_SIZE && _grid[y - 2][x - 2] == eBlock::EMPTY && _grid[y - 1][x - 1] == playerPawn && _grid[y + 1][x + 1] == eBlock::EMPTY){
+
+// 		if (x - 6 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 4] == playerPawn && _grid[y - 5][x - 5] == playerPawn && _grid[y - 6][x - 6] == eBlock::EMPTY){
+// 			_grid[y - 2][x - 2] = forbiddenMove;
+// 			_grid[y - 3][x - 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x - 3 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 3] == playerPawn && _grid[y - 5][x - 3] == playerPawn && _grid[y - 6][x - 3] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y - 6 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 4][x - 2] == playerPawn && _grid[y - 5][x - 1] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 3][x - 2] == playerPawn && _grid[y - 3][x - 1] == playerPawn && _grid[y - 3][x] == eBlock::EMPTY) ||
+// 			(x - 3 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 3] == playerPawn && _grid[y - 1][x - 3] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
+// 			(x - 6 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 2][x - 4] == playerPawn && _grid[y - 1][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY) ||
+// 			(x - 6 >= 0 && y - 3 >= 0 && _grid[y - 3][x - 3] == eBlock::EMPTY && _grid[y - 3][x - 4] == playerPawn && _grid[y - 3][x - 5] == playerPawn && _grid[y - 3][x - 6] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 3][x - 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x + 5 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == eBlock::EMPTY){
+// 			_grid[y + 1][x + 1];
+// 			_grid[y + 2][x + 2];
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 1][x + 2] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y - 1][x + 2] == eBlock::EMPTY) ||
+// 			(x + 5 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 1][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y - 1][x + 5] == eBlock::EMPTY) ||
+// 			(x + 5 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 3] == playerPawn && _grid[y + 2][x + 4] == playerPawn && _grid[y + 2][x + 5] == eBlock::EMPTY) ||
+// 			(x + 2 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 2] == playerPawn && _grid[y + 4][x + 2] == playerPawn && _grid[y + 5][x + 2] == eBlock::EMPTY)	||
+// 			(x + 2 < GRID_SIZE && y + 5 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 3][x + 1] == playerPawn && _grid[y + 4][x] == playerPawn && _grid[y + 5][x - 1] == eBlock::EMPTY) ||
+// 			(x + 2 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y + 2][x + 2] == eBlock::EMPTY && _grid[y + 2][x + 1] == playerPawn && _grid[y + 2][x] == playerPawn && _grid[y + 2][x - 1] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 2][x + 2];
+// 			return ;
+// 		}
+
+// 	}
+
+// }
+
+// void	Board::_checkDoubleThreeDiagonalRight(int x, int y){
+// 	// Get the pawn representing the current player
+// 	eBlock	playerPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : PLAYER_2);
+
+// 	// Get opponent pawn
+// 	eBlock	opponentPawn = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : PLAYER_1);
+
+// 	(void)opponentPawn;
+
+// 	eBlock	forbiddenMove = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_FORBIDDEN : eBlock::PLAYER_2_FORBIDDEN);
+
+// 	if (x - 2 >= 0 && y - 1 >= 0 &&  x  + 1 < GRID_SIZE && y + 2 < GRID_SIZE && _grid[y - 1][x + 1] == eBlock::EMPTY && _grid[y + 1][x - 1] == playerPawn && _grid[y - 1][x - 2] == eBlock::EMPTY){
+
+// 		if (x + 5 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 3] == playerPawn && _grid[y - 4][x + 4] == playerPawn && _grid[y - 5][x + 5] == eBlock::EMPTY){
+// 			_grid[y - 1][x + 1] = forbiddenMove;
+// 			_grid[y - 2][x + 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 2 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 2] == playerPawn && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 2] == eBlock::EMPTY) ||
+// 			(x + 5 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 2][x + 4] == playerPawn && _grid[y - 2][x + 5] == eBlock::EMPTY) ||
+// 			(x + 5 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 1][x + 3] == playerPawn && _grid[y][x + 4] == playerPawn && _grid[y - 1][x + 5] == eBlock::EMPTY) ||
+// 			(x + 2 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 1][x + 2] == playerPawn && _grid[y][x + 2] == playerPawn && _grid[y + 1][x + 2] == eBlock::EMPTY) ||
+// 			(x + 2 < GRID_SIZE && y - 2 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 2][x + 1] == playerPawn && _grid[y - 2][x] == playerPawn && _grid[y - 2][x - 1] == eBlock::EMPTY) ||
+// 			(x + 2 < GRID_SIZE && y - 5 >= 0 && _grid[y - 2][x + 2] == eBlock::EMPTY && _grid[y - 3][x + 1] == playerPawn && _grid[y - 4][x] == playerPawn && _grid[y - 5][x - 1] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 2][x + 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x - 6 >= 0 && y + 6 < GRID_SIZE && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 4] == playerPawn && _grid[y + 5][x - 5] == playerPawn && _grid[y + 6][x - 6] == eBlock::EMPTY){
+// 			_grid[y + 2][x - 2] = forbiddenMove;
+// 			_grid[y + 3][x - 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(y + 3 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 1][x - 3] == playerPawn && _grid[y][x - 3] == eBlock::EMPTY) ||
+// 			(y + 3 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 3][x - 2] == playerPawn && _grid[y + 3][x - 1] == playerPawn && _grid[y + 3][x] == eBlock::EMPTY) ||
+// 			(y + 6 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 1] == playerPawn && _grid[y + 6][x] == eBlock::EMPTY) ||
+// 			(y + 6 < GRID_SIZE && x - 3 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 4][x - 3] == playerPawn && _grid[y + 5][x - 3] == playerPawn && _grid[y + 6][x - 3] == eBlock::EMPTY) ||
+// 			(y + 3 < GRID_SIZE && x - 6 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 3][x - 4] == playerPawn && _grid[y + 3][x - 5] == playerPawn && _grid[y + 3][x - 6] == eBlock::EMPTY) ||
+// 			(y + 3 < GRID_SIZE && x - 6 >= 0 && _grid[y + 3][x - 3] == eBlock::EMPTY && _grid[y + 2][x - 4] == playerPawn && _grid[y + 1][x - 5] == playerPawn && _grid[y][x - 6] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 3][x - 3] = forbiddenMove;
+// 			return ;
+// 		}
+
+// 	}
+
+// 	if (x - 1 >= 0 && y - 2 >= 0 && x + 2 < GRID_SIZE && y + 1 < GRID_SIZE && _grid[y + 1][x - 1] == eBlock::EMPTY && _grid[y - 1][x + 1] == playerPawn && _grid[y - 2][x + 2] == eBlock::EMPTY){
+// 		if (x + 6 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 4] == playerPawn && _grid[y - 5][x + 5] == playerPawn && _grid[x - 6][y + 6] == eBlock::EMPTY){
+// 			_grid[y - 2][x + 2] = forbiddenMove;
+// 			_grid[y - 3][x + 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x + 3 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 3] == playerPawn && _grid[y - 5][x + 3] == playerPawn && _grid[y - 6][x + 3] == eBlock::EMPTY) ||
+// 			(x + 6 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 3][x + 4] == playerPawn && _grid[y - 3][x + 5] == playerPawn && _grid[y - 3][x + 6] == eBlock::EMPTY) ||
+// 			(x + 6 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 4] == playerPawn && _grid[y - 1][x + 5] == playerPawn && _grid[y][x + 6] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y - 3 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 2][x + 3] == playerPawn && _grid[y - 1][x + 3] == playerPawn && _grid[y][x + 3] == eBlock::EMPTY) ||
+// 			(x + 3 < GRID_SIZE && y - 6 >= 0 && _grid[y - 3][x + 3] == eBlock::EMPTY && _grid[y - 4][x + 2] == playerPawn && _grid[y - 5][x + 1] == playerPawn && _grid[y - 6][x] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y - 3][x + 3] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (x - 5 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 3] == playerPawn && _grid[y + 4][x + 4] == playerPawn && _grid[y + 5][x + 5] == eBlock::EMPTY){
+// 			_grid[y + 1][x - 1] = forbiddenMove;
+// 			_grid[y + 2][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 		else if (
+// 			(x - 2 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 1][x - 2] == playerPawn && _grid[y][x - 2] == playerPawn && _grid[y - 1][x + 2] == eBlock::EMPTY) ||
+// 			(x - 2 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 1] == playerPawn && _grid[y + 2][x] == playerPawn && _grid[y + 2][x - 1] == eBlock::EMPTY) ||
+// 			(x - 2 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 1] == playerPawn && _grid[y + 4][x] == playerPawn && _grid[y + 5][x - 1] == eBlock::EMPTY) ||
+// 			(x - 2 >= 0 && y + 5 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 3][x - 2] == playerPawn && _grid[y + 4][x - 2] == playerPawn && _grid[y + 5][x - 2] == eBlock::EMPTY) ||
+// 			(x - 5 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 2][x - 3] == playerPawn && _grid[y + 2][x - 4] == playerPawn && _grid[y + 2][x - 5] == eBlock::EMPTY) ||
+// 			(x - 5 >= 0 && y + 2 < GRID_SIZE && _grid[y + 2][x - 2] == eBlock::EMPTY && _grid[y + 1][x - 3] == playerPawn && _grid[y][x - 4] == playerPawn && _grid[y - 1][x - 5] == eBlock::EMPTY)
+// 			)
+// 		{
+// 			_grid[y + 2][x - 2] = forbiddenMove;
+// 			return ;
+// 		}
+// 	}
+// }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
 {

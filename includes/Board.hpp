@@ -53,6 +53,10 @@ class Board{
 		std::vector<std::pair<int, int>> &	_getCurrentPlayerPawns(void);
 		std::vector<std::pair<int, int>> &	_getOpponentPawns(void);
 
+		bool								_isEmpty(int, int);
+		void								_swapInt(int &, int &);
+		bool								_isPlayerPawn(int, int);
+
 		bool								_checkWin(std::pair<int, int>);
 		bool								_checkWinHorizontalCheck(int, int);
 		bool								_checkWinVerticalCheck(int, int);
@@ -64,10 +68,9 @@ class Board{
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureDiagonal(int, int);
 
 		void								_checkDoubleThree(std::pair<int, int>);
-		void								_checkDoubleThreeVertical(int, int);
-		void								_checkDoubleThreeHorizontal(int, int);
-		void								_checkDoubleThreeDiagonalLeft(int, int);
-		void								_checkDoubleThreeDiagonalRight(int, int);
+		bool								_checkIfThree(std::pair<int, int>, std::pair<int, int>);
+		void								_checkIfDoubleThree(std::pair<int, int> a, std::pair<int, int> b);
+		std::pair<PAIR_INT, PAIR_INT>		*_doubleThreeAllCaseChecker(std::pair<int, int>, std::pair<int, int>);
 
 		bool								_checkEndingCapture(std::pair<int, int>);
 		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
