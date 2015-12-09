@@ -67,10 +67,13 @@ class Board{
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureVertical(int, int);
 		std::pair<PAIR_INT, PAIR_INT>		*_checkCaptureDiagonal(int, int);
 
+		std::vector<std::pair<int, int>> 	*_compareThrees(std::vector<std::pair<int, int>>, std::vector<std::pair<int, int>>);
+		std::vector<std::pair<int, int>> 	*_findThreeNearBy(std::pair<int, int>, std::pair<int, int>);
+		std::pair<int, int>					*_findAdjacentPawn(std::pair<int, int>);
 		void								_checkDoubleThree(std::pair<int, int>);
-		bool								_checkIfThree(std::pair<int, int>, std::pair<int, int>);
+		std::vector<std::pair<int, int>>	*_checkIfThree(std::pair<int, int>, std::pair<int, int>);
 		void								_checkIfDoubleThree(std::pair<int, int> a, std::pair<int, int> b);
-		std::pair<PAIR_INT, PAIR_INT>		*_doubleThreeAllCaseChecker(std::pair<int, int>, std::pair<int, int>);
+		bool								_checkIfReallyForbidden(std::pair<int, int>, std::pair<int, int>, std::pair<int, int>);
 
 		bool								_checkEndingCapture(std::pair<int, int>);
 		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
