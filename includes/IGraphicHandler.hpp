@@ -26,6 +26,7 @@ public:
 	virtual void drawInfos(eTurn, int, int) = 0;
 	virtual void setTurn(eTurn) = 0;
 	virtual eKeys modalShow(std::string msg) = 0;
+	virtual void drawAiStats(float) = 0;
 };
 
 #endif // IGRAPHIC_HANDLER_HPP

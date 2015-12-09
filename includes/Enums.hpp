@@ -14,7 +14,8 @@ enum eKeys {
 	SPACE,
 	RETURN,
 	MOUSE_LEFT,
-	R
+	R,
+	D
 };
 
 enum eBlock {

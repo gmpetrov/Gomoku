@@ -37,6 +37,7 @@ class SfmlHandler : public IGraphicHandler{
         void                    drawInfos(eTurn, int, int);
         void                    setTurn(eTurn);
         eKeys                   modalShow(std::string);
+        void                    drawAiStats(float);
 
 
         std::map<int, eKeys>    getKeyMap();

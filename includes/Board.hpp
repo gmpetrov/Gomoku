@@ -20,6 +20,7 @@
 # include <IGraphicHandler.hpp>
 # include <stdlib.h>
 # include <time.h>
+# include <AI.hpp>
 
 # define GRID_SIZE 19
 # define PAIR_INT std::pair<int, int>
@@ -43,6 +44,8 @@ class Board{
 		void								drawForbiddenMoves(IGraphicHandler *);
 		void								reset(IGraphicHandler *);
 		eTurn								getTurn(void);
+		void								setDebugMode(bool);
+		bool								isAiTurn(void);
 
 		bool 								isAlive;
 	private:
@@ -85,22 +88,25 @@ class Board{
 		void								_updateTurn(IGraphicHandler *);
 		void								_updateCaptureScore(void);
 
-
+		// Attrs
 		int									_width;
 		int 								_height;
 		eChoice								_choice;
 		eTurn								_turn;
-
 		std::vector<std::vector<eBlock>> 	_map;
 		std::vector<std::pair<int, int>>	_pawnsPlayer1;
 		std::vector<std::pair<int, int>>	_pawnsPlayer2;
-
+		eChoice								_player1;
+		eChoice								_player2;
 		time_t 								_elapsedTime;
-
 		std::vector<std::vector<eBlock>>  	 _grid;
-
 		int									_player1Captures;
 		int									_player2Captures;
+		bool								_debug;\
+
+		// Objects
+		AI									_ai;
+
 };
 
 #endif

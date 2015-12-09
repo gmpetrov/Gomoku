@@ -16,8 +16,16 @@ bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b);
 
 Board::Board(void){}
 
-Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN_PLAYER_1), _grid(GRID_SIZE, std::vector<eBlock>(GRID_SIZE)), _player1Captures(0), _player2Captures(0){
+Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN_PLAYER_1), _grid(GRID_SIZE, std::vector<eBlock>(GRID_SIZE)), _player1Captures(0), _player2Captures(0), _debug(false){
 	_initGrid();
+
+	if (_choice == eChoice::IA){
+		int rnd = rand() % 100;
+
+		eTurn turn = (rnd < 50 ? eTurn::TURN_PLAYER_1 : eTurn::TURN_PLAYER_2);
+
+		_ai.setTurn(turn);
+	}
 }
 
 Board::~Board(void){
@@ -61,7 +69,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 	else if (key == eKeys::MOUSE_LEFT){
 
 		// Get the index of the current move
-		std::pair<int, int> index = graph->play(_turn);
+		std::pair<int, int> index = (isAiTurn() ? _ai.play(_grid) : graph->play(_turn));
 
 		// Check that the grid is empty at move's coordinates
 		if (!_isCaseEmpty(index))
@@ -89,11 +97,10 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 			// Check if there is a possible end capture move
 			if (!_checkEndingCapture(index)){
+
 				// It's a winner move
 				throw std::string("win");
 			}
-			std::cout << "POSSIBLE END CAPTURE" << std::endl;
-
 		}
 
 		_checkDoubleThree(index);
@@ -113,6 +120,10 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		// draw the game, to close the modal
 		draw(graph);
+	}
+	else if  (key == eKeys::D){
+		setDebugMode(!_debug);
+		std::cout << "Debug mode : " << _debug << std::endl;
 	}
 }
 
@@ -163,6 +174,9 @@ void 	Board::draw(IGraphicHandler *graph){
 	graph->draw();
 
 	graph->drawInfos(_turn, _player1Captures, _player2Captures);
+
+	if (_choice == eChoice::IA)
+		graph->drawAiStats(_ai.getElapsedTime());
 
 	drawPawns(_pawnsPlayer1, eColor::PLAYER_1_COLOR, graph);
 	drawPawns(_pawnsPlayer2, eColor::PLAYER_2_COLOR, graph);
@@ -1003,6 +1017,14 @@ bool							Board::_checkIfReallyForbidden(std::pair<int, int> forbidden, std::pa
 		return false;
 
 	return true;
+}
+
+void						Board::setDebugMode(bool value){
+	_debug = value;
+}
+
+bool						Board::isAiTurn(void){
+	return _choice == eChoice::IA && _turn == _ai.getTurn();
 }
 
 bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)

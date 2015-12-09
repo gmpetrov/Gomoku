@@ -11,6 +11,7 @@ set(SOURCE_FILES
     srcs/Board.cpp
     srcs/GraphSwitch.cpp
     srcs/Human.cpp
+    srcs/AI.cpp
     )
 
 include_directories(includes)

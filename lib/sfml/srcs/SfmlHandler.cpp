@@ -20,7 +20,8 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 		{ sf::Keyboard::Num3, eKeys::THREE },
 		{ sf::Keyboard::Return, eKeys::RETURN },
 		{ sf::Keyboard::Space, eKeys::SPACE },
-		{ sf::Keyboard::R, eKeys::R }
+		{ sf::Keyboard::R, eKeys::R },
+		{ sf::Keyboard::D, eKeys::D }
 	};
 
 	this->_colorMap = {
@@ -341,8 +342,7 @@ eChoice SfmlHandler::drawMenu(void)
 		else if (key == eKeys::DOWN || key == eKeys::UP)
 			newChoice = (newChoice == eChoice::HUMAN ? eChoice::IA : eChoice::HUMAN);
 		else if (key == eKeys::RETURN){
-			if (choice == eChoice::HUMAN)
-				return choice;
+			return choice;
 		}
 
 		// If choice has changed, we cacn draw
@@ -364,7 +364,7 @@ eChoice SfmlHandler::drawMenu(void)
 			// Configure second choice
 			sf::Text choice_2;
 			choice_2.setFont(_font);
-			choice_2.setString("2 - Human vs IA (Available soon)");
+			choice_2.setString("2 - Human vs AI");
 			choice_2.setCharacterSize(54);
 			choice_2.setColor(sf::Color(255, 255, 255));
 			choice_2.setPosition(_w / 3, (_h / 2) + SPACING_RATIO);
@@ -502,6 +502,20 @@ eKeys	SfmlHandler::modalShow(std::string msg){
 		if (key == eKeys::ESC || key == eKeys::SPACE || key == eKeys::RETURN || key == eKeys::R)
 			return key;
 	}
+}
+
+void	SfmlHandler::drawAiStats(float elapsedTime){
+
+	std::cout << "YO " << elapsedTime << std::endl;
+
+	sf::Text stat;
+	stat.setFont(_font);
+	stat.setString("AI time : " + std::to_string(elapsedTime)  + " s");
+	stat.setCharacterSize(CHAR_SIZE_INFO);
+	stat.setColor(sf::Color(255, 255, 255));
+	stat.setPosition(_w / SPACING_RATIO, _h / SPACING_RATIO + CHAR_SIZE_INFO * 3 + MARGIN_SIZE_INFO);
+
+	_window->draw(stat);
 }
 
 

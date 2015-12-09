@@ -36,7 +36,9 @@ int main(void)
 
 	while (board.isAlive){
 
-		eKeys key = graphic.graph->getKeyPressed();
+		// If it's AI turn simulate a mouse left key
+		eKeys key = (board.isAiTurn() ? eKeys::MOUSE_LEFT : graphic.graph->getKeyPressed());
+
 		try{
 			board.handleKey(key, graphic.graph);
 		}
