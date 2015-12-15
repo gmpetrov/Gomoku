@@ -83,7 +83,7 @@ SfmlHandler::SfmlHandler() : _grid(GRID_SIZE, std::vector<std::pair<int, int>>(G
 
 	// Init Audio
 	if (!_music.openFromFile("audio/japan.ogg")){ std::cout << "Fail to load audio" << std::endl; exit(EXIT_FAILURE); }
-	_music.play();
+	// _music.play();
 	_music.setPlayingOffset(sf::seconds(2));
 	_music.setLoop(true);
 }
@@ -505,8 +505,6 @@ eKeys	SfmlHandler::modalShow(std::string msg){
 }
 
 void	SfmlHandler::drawAiStats(float elapsedTime){
-
-	std::cout << "YO " << elapsedTime << std::endl;
 
 	sf::Text stat;
 	stat.setFont(_font);

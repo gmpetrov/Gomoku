@@ -102,11 +102,11 @@ class Board{
 		std::vector<std::vector<eBlock>>  	 _grid;
 		int									_player1Captures;
 		int									_player2Captures;
-		bool								_debug;\
+		bool								_debug;
 
 		// Objects
 		AI									_ai;
 
 };
 
-#endif
+#endif // BOARD_HPP

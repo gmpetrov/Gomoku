@@ -31,6 +31,8 @@ int main(void)
 		exit(EXIT_SUCCESS);
 	}
 
+	choice = eChoice::IA;
+
 	// Instanciate the board with selected choice
 	Board board(choice);
 
