@@ -10,10 +10,7 @@
 # include <time.h>
 # include <set>
 # include <State.hpp>
-
-# define GRID_SIZE 19
-# define PAIR_INT std::pair<int, int>
-# define CAPTURE_SCORE_WIN 10
+# include <RulesChecker.hpp>
 
 class AI{
 	public:
@@ -40,6 +37,8 @@ class AI{
 		/* Attrs */
 		eTurn				_turn;
 		float				_elapsedTime;
+		RulesChecker		_checker;
+
 };
 
 #endif // AI_HPP

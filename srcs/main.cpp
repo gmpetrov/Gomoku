@@ -19,17 +19,17 @@ int main(void)
 
 	graphic.setGraphic("sfml");
 
-	graphic.graph->animationLogo();
+	// graphic.graph->animationLogo();
 
 	eChoice choice;
 
 	// Launch the Menu
-	if ((choice = graphic.graph->drawMenu()) == eChoice::QUIT){
+	// if ((choice = graphic.graph->drawMenu()) == eChoice::QUIT){
 
-		// The ESC key has been pressed while in menu
-		graphic.graph->close();
-		exit(EXIT_SUCCESS);
-	}
+	// 	// The ESC key has been pressed while in menu
+	// 	graphic.graph->close();
+	// 	exit(EXIT_SUCCESS);
+	// }
 
 	choice = eChoice::IA;
 

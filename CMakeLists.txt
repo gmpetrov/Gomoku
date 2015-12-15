@@ -13,6 +13,7 @@ set(SOURCE_FILES
     srcs/Human.cpp
     srcs/AI.cpp
     srcs/State.cpp
+    srcs/RulesChecker.cpp
     )
 
 include_directories(includes)
