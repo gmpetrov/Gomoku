@@ -12,7 +12,7 @@
 # include <State.hpp>
 # include <RulesChecker.hpp>
 
-# define ALGO_DEPTH 0
+# define ALGO_DEPTH 4
 
 class AI{
 	public:
@@ -39,10 +39,12 @@ class AI{
 		void				_printSet(std::set<State>) const;
 		State				_findBestMove(State &);
 		int					_evaluateChild(State &);
+		unsigned int		_countEmptyCase(GRID_REF, eTurn &);
+		unsigned int		_scaleDepth(unsigned int, GRID_REF, eTurn &);
 
 		/* Attrs */
 		eTurn				_turn;
-		float				_elapsedTime;
+		double				_elapsedTime;
 		RulesChecker		_checker;
 
 };

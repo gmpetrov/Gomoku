@@ -27,7 +27,9 @@ std::pair<int, int>		AI::play(std::vector<std::vector<eBlock>> & grid){
 	// End chrono
 	end = std::chrono::system_clock::now();
 
-	_elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(end - start).count();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+
+    _elapsedTime = elapsed_seconds.count();
 
 	return move;
 }
@@ -68,20 +70,23 @@ State			AI::_findBestMove(State & state){
 	// will contain all results from minmax
 	std::set<State> states;
 
+	GRID grid = state.getGrid();
+
+	unsigned int depth = _scaleDepth(ALGO_DEPTH, grid, _turn);
+
+	std::cout << "DEPTH : " << depth << std::endl;
+
 	for (size_t j = 0; j < GRID_SIZE; j++){
 		for (size_t i = 0; i < GRID_SIZE; i++){
 
 			// Case is empty or forbidden for the opponent
-			if (state.getGrid()[j][i] == eBlock::EMPTY || state.getGrid()[j][i] == opponentPlayerForbidden){
-
-				// Copy the grid
-				std::vector<std::vector<eBlock>> grid = state.getGrid();
+			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentPlayerForbidden){
 
 				// Instanciate a new State
 				State child(grid, &state, i, j);
 
 				// result of minmax algo for the current node
-				State result = _minMaxExplorer(child, _turn, false, ALGO_DEPTH);
+				State result = _minMaxExplorer(child, _turn, false, depth);
 
 				// add the result to the container
 				states.insert(result);
@@ -119,20 +124,18 @@ std::vector<State>	AI::getPossibleMoves(State & state, eTurn & turn){
 
 State				AI::_minMaxExplorer(State & state, eTurn & turn, bool isMax, int depth){
 
-	// eTurn opponentTurn = (turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_2);
+	eTurn opponentTurn = (turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_2);
 
 	GRID grid = state.getGrid();
-
-	std::cout << "DEPTH : " << depth << std::endl;
 
 	if (_checker.checkWin(std::make_pair(state.getX(), state.getY()), grid, turn)){
 		state.setRating(42000);
 		return state;
 	}
-	// else if (_checker.checkWin(std::make_pair(state.getX(), state.getY()), grid, opponentTurn)){
-	// 	state.setRating(-42000);
-	// 	return state;
-	// }
+	else if (_checker.checkWin(std::make_pair(state.getX(), state.getY()), grid, opponentTurn)){
+		state.setRating(-42000);
+		return state;
+	}
 	// else if --> match null
 
 	if (depth == 0){
@@ -183,4 +186,36 @@ void			AI::_printSet(std::set<State> states) const{
 	for (std::set<State>::iterator it = states.begin(); it != states.end(); ++it){
 		std::cout << "state rating : " << (*it).getRating() << ", x : " << (*it).getX() << ", y : " << (*it).getY() << std::endl;
 	}
+}
+
+unsigned int	AI::_countEmptyCase(GRID_REF grid, eTurn & turn){
+
+	eBlock opponentForbiden = (turn == TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
+	unsigned int counter = 0;
+
+	for (size_t j = 0; j < GRID_SIZE; j++){
+		for (size_t i = 0; i < GRID_SIZE; i++){
+			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentForbiden)
+				counter++;
+		}
+	}
+
+	return counter;
+}
+
+unsigned int	AI::_scaleDepth(unsigned int depth, GRID_REF grid, eTurn & turn){
+
+	unsigned int nbEmptyCase = _countEmptyCase(grid, turn);
+
+	if (nbEmptyCase < 45)
+		return depth;
+	else if (nbEmptyCase < 90)
+		return depth - 1;
+	else if (nbEmptyCase < 180)
+		return depth - 2;
+	else if (nbEmptyCase < 270)
+		return depth - 3;
+	return 0;
+
+	// unsigned int scaledDepth = depth - ()
 }
