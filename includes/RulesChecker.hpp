@@ -12,6 +12,7 @@
 # define GRID_SIZE 19
 # define PAIR_INT std::pair<int, int>
 # define CAPTURE_SCORE_WIN 10
+# define GRID std::vector<std::vector<eBlock>>
 # define GRID_REF std::vector<std::vector<eBlock>> &
 # define PLAYER_PAWNS_REF std::vector<std::pair<int, int>> &
 
@@ -27,6 +28,7 @@ class RulesChecker{
 		bool								checkWin(std::pair<int, int>, GRID_REF, eTurn &);
 		std::pair<PAIR_INT, PAIR_INT>		*checkCapture(std::pair<int, int>, GRID_REF);
 		void								checkDoubleThree(std::pair<int, int>, GRID_REF, eTurn &);
+		// bool 								checkDraw(std::pair<int, int>, GRID_REF, eTurn &);
 
 		bool								checkEndingCapture(std::pair<int, int>, GRID_REF, eTurn &, int &, PLAYER_PAWNS_REF);
 		void								removePawnPair(PAIR_INT, PAIR_INT, PLAYER_PAWNS_REF, GRID_REF);

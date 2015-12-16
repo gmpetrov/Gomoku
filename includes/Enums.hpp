@@ -52,4 +52,11 @@ enum eTurn{
 	TURN_PLAYER_2
 };
 
+enum eAlgoValue{
+	LOST = -42000,
+	WIN  = 42000,
+	DRAW = 0,
+	AVERAGE
+};
+
 #endif // ENUMS_HPP

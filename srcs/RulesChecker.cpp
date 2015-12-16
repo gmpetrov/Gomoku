@@ -757,7 +757,6 @@ void	RulesChecker::removePawnPair(PAIR_INT a, PAIR_INT b, PLAYER_PAWNS_REF conta
 	_removePawn(container, b, grid);
 }
 
-
 bool	pair_compare(std::pair<int, int> & a, std::pair<int, int> & b)
 {
 	return (a.first == b.first && a.second == b.second);
