@@ -5,7 +5,7 @@
 #include <GraphSwitch.hpp>
 #include <Board.hpp>
 
-bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b);
+bool	pair_compare(std::pair<int, int> & a, std::pair<int, int> & b);
 
 int main(void)
 {

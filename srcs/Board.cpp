@@ -83,7 +83,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			// Remember to delete the pointer after utilisation
 
 			// Delete the pairs
-			_removePawnPair((*ptr).first, (*ptr).second);
+			_checker.removePawnPair((*ptr).first, (*ptr).second, _getOpponentPawns(), _grid);
 
 			// Update scores
 			_updateCaptureScore();
@@ -94,7 +94,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 		else if (_checker.checkWin(index, _grid, _turn)){
 
 			// Check if there is a possible end capture move
-			if (!_checkEndingCapture(index)){
+			if (!_checker.checkEndingCapture(index, _grid, _turn, _getOpponentScore(), _getOpponentPawns())){
 
 				// It's a winner move
 				throw std::string("win");
@@ -221,29 +221,6 @@ void	Board::reset(IGraphicHandler *graph){
 	isAlive = true;
 }
 
-void	Board::_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn){
-
-	// Loop through the container
-	for (std::vector<std::pair<int, int>>::iterator it = container.begin(); it != container.end(); ++it){
-
-		if (pair_compare(*it, pawn)){
-			// Compare the pawns to find the one to delete
-			container.erase(it);
-			_grid[pawn.second][pawn.first] = eBlock::EMPTY;
-			return ;
-		}
-	}
-}
-
-void	Board::_removePawnPair(PAIR_INT a, PAIR_INT b)
-{
-	std::vector<std::pair<int, int>> & container = (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer2 : _pawnsPlayer1);
-
-	// Delete the pawns
-	_removePawn(container, a);
-	_removePawn(container, b);
-}
-
 void	Board::_removeAdjacentForbiddenMove(std::pair<int, int> index, eBlock forbiddenMove){
 
 	int	x = index.first;
@@ -280,92 +257,12 @@ void	Board::_updateCaptureScore(void){
 	if (captureScore >= 10) { throw std::string("win"); }
 }
 
-bool	Board::_checkEndingCapture(std::pair<int, int> index){
-
-	std::pair<PAIR_INT, PAIR_INT> *ptr;
-
-	// Get opponent block
-	eBlock opponent = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
-	// int opponentScore = (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
-
-	// Iterate through grid
-	for (int j = 0; j < GRID_SIZE; j++){
-		for (int i = 0; i < GRID_SIZE; i++){
-
-			// If the case is empty
-			if (_grid[j][i] == eBlock::EMPTY){
-
-				// we set the case at this index to be the opponent (needed by _checkCapture)
-				_grid[j][i] = opponent;
-
-				// if there is possible capture we return true, the game continue
-				if ((ptr = _checker.checkCapture(std::make_pair(i, j), _grid)) != NULL){
-
-					bool res = false;
-					if ((res = _checkIfCaptureBreaksAlignement(ptr, index))){
-						std::cout << "BREAKS 5 STONES" << std::endl;
-					}
-					else{
-
-						// get Opponent score
-						int score = (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
-
-						// check if the opponent can win with this capture
-						if (score >= 8) {
-							res = true;
-						}
-					}
-
-					// We set back the value at the index to empty
-					_grid[j][i] = eBlock::EMPTY;
-
-					// clean
-					delete ptr;
-
-					return res ;
-				}
-
-				// We set back the value at the index to empty
-				_grid[j][i] = eBlock::EMPTY;
-			}
-		}
-	}
-	return false ;
-}
-
-bool	Board::_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *captures, PAIR_INT last){
-
-	// Get the captured pairs
-	std::pair<int, int> a = (*captures).first;
-	std::pair<int, int> b = (*captures).second;
-
-	// Get captured's players's container
-	std::vector<std::pair<int, int>> & container = (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
-
-	// remove the pawn for the check
-	_removePawn(container, a);
-	_removePawn(container, b);
-
-	// check if it's a win, we want to return the opposite of the return value of checkWinm
-	bool res = !_checker.checkWin(last, _grid, _turn);
-
-	// rollback
-	container.push_back(a);
-	container.push_back(b);
-
-	eBlock blockCurrentPlayer = (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
-	_grid[a.second][a.first] = blockCurrentPlayer;
-	_grid[b.second][b.first] = blockCurrentPlayer;
-
-	return res;
-}
-
 std::vector<std::pair<int, int>> & Board::_getCurrentPlayerPawns(void){
 	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
 }
 
 std::vector<std::pair<int, int>> & Board::_getOpponentPawns(void){
-	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
+	return (_turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer2 : _pawnsPlayer1);
 }
 
 eTurn	Board::getTurn(){
@@ -378,4 +275,8 @@ void						Board::setDebugMode(bool value){
 
 bool						Board::isAiTurn(void){
 	return _choice == eChoice::IA && _turn == _ai.getTurn();
+}
+
+int							&Board::_getOpponentScore(void){
+	return (_turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
 }

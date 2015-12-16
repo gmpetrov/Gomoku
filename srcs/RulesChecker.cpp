@@ -330,58 +330,82 @@ std::pair<PAIR_INT, PAIR_INT>  *RulesChecker::_checkCaptureDiagonal(int x, int y
 	return NULL;
 }
 
-// bool	RulesChecker::_checkEndingCapture(std::pair<int, int> index, std::vector<std::vector<eBlock>> & grid, eTurn & turn){
+bool	RulesChecker::checkEndingCapture(std::pair<int, int> index, GRID_REF grid, eTurn & turn, int & opponentScore, PLAYER_PAWNS_REF container){
 
-// 	std::pair<PAIR_INT, PAIR_INT> *ptr;
+	std::pair<PAIR_INT, PAIR_INT> *ptr;
 
-// 	// Get opponent block
-// 	eBlock opponent = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
-// 	// int opponentScore = (turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
+	// Get opponent block
+	eBlock opponent = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+	// int opponentScore = (turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
 
-// 	// Iterate through grid
-// 	for (int j = 0; j < GRID_SIZE; j++){
-// 		for (int i = 0; i < GRID_SIZE; i++){
+	// Iterate through grid
+	for (int j = 0; j < GRID_SIZE; j++){
+		for (int i = 0; i < GRID_SIZE; i++){
 
-// 			// If the case is empty
-// 			if (grid[j][i] == eBlock::EMPTY){
+			// If the case is empty
+			if (grid[j][i] == eBlock::EMPTY){
 
-// 				// we set the case at this index to be the opponent (needed by _checkCapture)
-// 				grid[j][i] = opponent;
+				// we set the case at this index to be the opponent (needed by _checkCapture)
+				grid[j][i] = opponent;
 
-// 				// if there is possible capture we return true, the game continue
-// 				if ((ptr = checkCapture(std::make_pair(i, j), grid)) != NULL){
+				// if there is possible capture we return true, the game continue
+				if ((ptr = checkCapture(std::make_pair(i, j), grid)) != NULL){
 
-// 					bool res = false;
-// 					if ((res = _checkIfCaptureBreaksAlignement(ptr, index))){
-// 						std::cout << "BREAKS 5 STONES" << std::endl;
-// 					}
-// 					else{
+					bool res = false;
+					if ((res = _checkIfCaptureBreaksAlignement(ptr, index, grid, turn, container))){
+						std::cout << "BREAKS 5 STONES" << std::endl;
+					}
+					else{
 
-// 						// get Opponent score
-// 						int score = (turn == eTurn::TURN_PLAYER_1 ? _player2Captures : _player1Captures);
+						// check if the opponent can win with this capture
+						if (opponentScore >= 8) {
+							res = true;
+						}
+					}
 
-// 						// check if the opponent can win with this capture
-// 						if (score >= 8) {
-// 							res = true;
-// 						}
-// 					}
+					// We set back the value at the index to empty
+					grid[j][i] = eBlock::EMPTY;
 
-// 					// We set back the value at the index to empty
-// 					grid[j][i] = eBlock::EMPTY;
+					// clean
+					delete ptr;
 
-// 					// clean
-// 					delete ptr;
+					return res ;
+				}
 
-// 					return res ;
-// 				}
+				// We set back the value at the index to empty
+				grid[j][i] = eBlock::EMPTY;
+			}
+		}
+	}
+	return false ;
+}
 
-// 				// We set back the value at the index to empty
-// 				grid[j][i] = eBlock::EMPTY;
-// 			}
-// 		}
-// 	}
-// 	return false ;
-// }
+bool	RulesChecker::_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *captures, PAIR_INT last, GRID_REF grid, eTurn & turn, PLAYER_PAWNS_REF container){
+
+	// Get the captured pairs
+	std::pair<int, int> a = (*captures).first;
+	std::pair<int, int> b = (*captures).second;
+
+	// Get captured's players's container
+	// std::vector<std::pair<int, int>> & container = (turn == eTurn::TURN_PLAYER_1 ? _pawnsPlayer1 : _pawnsPlayer2);
+
+	// remove the pawn for the check
+	_removePawn(container, a, grid);
+	_removePawn(container, b, grid);
+
+	// check if it's a win, we want to return the opposite of the return value of checkWinm
+	bool res = !checkWin(last, grid, turn);
+
+	// rollback
+	container.push_back(a);
+	container.push_back(b);
+
+	eBlock blockCurrentPlayer = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+	grid[a.second][a.first] = blockCurrentPlayer;
+	grid[b.second][b.first] = blockCurrentPlayer;
+
+	return res;
+}
 
 /*
 **	Take the current player's last move , if there is a possible double three, make further moves forbidden
@@ -711,7 +735,31 @@ bool	RulesChecker::_isPlayerPawn(int x, int y, GRID_REF grid, eTurn & turn){
 	return grid[y][x] == playerPawn;
 }
 
-bool	pair_compare(std::pair<int, int> a, std::pair<int, int> b)
+void	RulesChecker::_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn, GRID_REF grid){
+
+	// Loop through the container
+	for (std::vector<std::pair<int, int>>::iterator it = container.begin(); it != container.end(); ++it){
+		if (pair_compare(*it, pawn)){
+
+			std::cout << "PAWN REMOVED" << std::endl;
+			// Compare the pawns to find the one to delete
+			container.erase(it);
+			grid[pawn.second][pawn.first] = eBlock::EMPTY;
+			return ;
+		}
+	}
+}
+
+void	RulesChecker::removePawnPair(PAIR_INT a, PAIR_INT b, PLAYER_PAWNS_REF container, GRID_REF grid)
+{
+	// Delete the pawns
+	_removePawn(container, a, grid);
+	_removePawn(container, b, grid);
+}
+
+
+bool	pair_compare(std::pair<int, int> & a, std::pair<int, int> & b)
 {
 	return (a.first == b.first && a.second == b.second);
 }
+

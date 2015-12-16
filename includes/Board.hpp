@@ -53,14 +53,13 @@ class Board{
 		void 								_setMove(std::pair<int, int>);
 		std::vector<std::pair<int, int>> &	_getCurrentPlayerPawns(void);
 		std::vector<std::pair<int, int>> &	_getOpponentPawns(void);
+		int									&_getOpponentScore(void);
 
 		bool								_isPlayerPawn(int, int);
 
 		bool								_checkEndingCapture(std::pair<int, int>);
 		bool								_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT> *, PAIR_INT);
 
-		void								_removePawn(std::vector<std::pair<int, int>> & container, std::pair<int, int> pawn);
-		void								_removePawnPair(PAIR_INT, PAIR_INT);
 		void								_removeAdjacentForbiddenMove(std::pair<int, int>, eBlock);
 
 		void								_updateTurn(IGraphicHandler *);
