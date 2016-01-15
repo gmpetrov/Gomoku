@@ -48,15 +48,17 @@ enum eChoice{
 };
 
 enum eTurn{
-	TURN_PLAYER_1 = 0,
+	TURN_PLAYER_1 = 1,
 	TURN_PLAYER_2
 };
 
-enum eAlgoValue{
-	LOST = -42000,
-	WIN  = 42000,
-	DRAW = 0,
-	AVERAGE
+enum eEval{
+	EVAL_LOSE = -4242,
+	EVAL_CLOSE_OPPOENENT = 4242,
+	EVAL_ALIGN,
+	EVAL_CAPTURE,
+	EVAL_STOP_ALIGN,
+	EVAL_WIN
 };
 
 #endif // ENUMS_HPP

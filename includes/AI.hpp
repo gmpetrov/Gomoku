@@ -3,16 +3,17 @@
 # define AI_HPP
 
 # include <iostream>
-# include <Enums.hpp>
 # include <vector>
 # include <chrono>
 # include <ctime>
 # include <time.h>
 # include <set>
-# include <State.hpp>
-# include <RulesChecker.hpp>
 # include <thread>
 # include <mutex>
+
+# include <Enums.hpp>
+# include <State.hpp>
+# include <Heuristic.hpp>
 
 
 # define ALGO_DEPTH 2
@@ -46,16 +47,20 @@ class AI{
 		void				_printSet(std::set<State>) const;
 		unsigned int		_scaleDepth(unsigned int, GRID_REF, eTurn &);
 
-		int					_calcMax(GRID_REF, eTurn, int depth, int alpha, int beta);
-		int					_calcMin(GRID_REF, eTurn, int depth, int alpha, int beta);
+		int					_calcMax(GRID_REF, eTurn, std::pair<int, int>, int depth, int alpha, int beta);
+		int					_calcMin(GRID_REF, eTurn, std::pair<int, int>, int depth, int alpha, int beta);
 		void				_play(GRID_REF, eTurn, int x, int y);
 		void				_cancelPlay(GRID_REF, int x, int y);
-		int					_evaluateGrid(GRID_REF);
+
+		int					_evaluateGrid(GRID_REF, eTurn, std::pair<int, int>);
+		bool				_closeToOpponentPawn(GRID_REF grid, eBlock opponent, int x, int y);
+
 
 		/* Attrs */
 		eTurn				_turn;
 		double				_elapsedTime;
-		RulesChecker		_checker;
+		// RulesChecker		_checker;
+		Heuristic			_heur;
 
 };
 

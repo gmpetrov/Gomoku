@@ -14,6 +14,7 @@ set(SOURCE_FILES
     srcs/AI.cpp
     srcs/State.cpp
     srcs/RulesChecker.cpp
+    srcs/Heuristic.cpp
     )
 
 include_directories(includes)

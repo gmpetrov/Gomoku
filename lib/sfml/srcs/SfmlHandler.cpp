@@ -462,7 +462,7 @@ eKeys	SfmlHandler::modalShow(std::string msg){
 
 	// Box containing the msg
 	sf::RectangleShape box(sf::Vector2f(_w / 4, _h / 4));
-	box.setFillColor(sf::Color(255, 255, 255));
+	box.setFillColor(sf::Color(255, 255, 255, 150));
 	box.setOrigin((_w / 4) / 2, (_h / 4) / 2);
 	box.setPosition(_w / 2, _h / 2 + 22);
 

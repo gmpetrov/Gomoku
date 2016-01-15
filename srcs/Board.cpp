@@ -96,6 +96,8 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			// Check if there is a possible end capture move
 			if (!_checker.checkEndingCapture(index, _grid, _turn, _getOpponentScore(), _getOpponentPawns())){
 
+				draw(graph);
+
 				// It's a winner move
 				throw std::string("win");
 			}
