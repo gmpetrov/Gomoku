@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 
 project(Gomoku)
 
-set(dev-warnings "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -std=c++11")
+set(dev-warnings "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -pedantic -std=c++11 -g")
 set(warnings "${CMAKE_CXX_FLAGS} -O3 -std=c++11")
 set(CMAKE_CXX_FLAGS "${dev-warnings}")
 set(EXECUTABLE_NAME Gomoku)

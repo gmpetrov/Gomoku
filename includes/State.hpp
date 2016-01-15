@@ -6,11 +6,10 @@
 # include <Enums.hpp>
 # include <set>
 
-
 	class State{
 		public:
-			State(std::vector<std::vector<eBlock>>);
-			State(std::vector<std::vector<eBlock>>, State * parent, int , int);
+			State(std::vector<std::vector<eBlock>> &);
+			State(std::vector<std::vector<eBlock>> &, int , int);
 			~State(void);
 			State(const State & src);
 			State & operator=(State const & src);
@@ -19,15 +18,13 @@
 			/* Methods */
 			int 								getRating(void) const;
 			std::vector<std::vector<eBlock>>	getGrid(void) const;
+			std::vector<std::vector<eBlock>>	&getGridRef(void);
 			void								setRating(int);
 			void								setGrid(std::vector<std::vector<eBlock>> &);
-			void								addChild(State child);
-			std::set<State>						getChildren(void) const;
 			int									getX(void) const;
 			int									getY(void) const;
 
 			/* Attrs */
-			State								*parent;
 
 		private:
 
@@ -35,7 +32,6 @@
 			State(void);
 
 			/* Attrs */
-			std::set<State>						_children;
 			std::vector<std::vector<eBlock>> 	_grid;
 			int									_rating;
 			int									_x;

@@ -11,8 +11,11 @@
 # include <set>
 # include <State.hpp>
 # include <RulesChecker.hpp>
+# include <thread>
+# include <mutex>
 
-# define ALGO_DEPTH 4
+
+# define ALGO_DEPTH 2
 
 class AI{
 	public:
@@ -27,20 +30,27 @@ class AI{
 		float				getElapsedTime(void);
 		eBlock				getCurrentPlayerForbidden(void);
 		eBlock				getOpponentPlayerForbidden(void);
-		std::vector<State>	getPossibleMoves(State &, eTurn &);
+		void				getPossibleMoves(State &, eTurn &, std::vector<State> &);
+		eTurn				notTurn(eTurn);
+
+		std::recursive_mutex			algoMutex;
+		std::recursive_mutex			mtx;
+
 
 	private:
 		/* Methods */
 		int					_basicHeuristic(std::vector<std::vector<eBlock>> &);
+
 		std::pair<int, int>	_minMax(GRID_REF);
-		State				_minMaxExplorer(State &, eTurn &, bool, int);
-		State				_getMax(std::set<State> &);
-		State				_getMin(std::set<State> &);
+
 		void				_printSet(std::set<State>) const;
-		State				_findBestMove(State &);
-		int					_evaluateChild(State &);
-		unsigned int		_countEmptyCase(GRID_REF, eTurn &);
 		unsigned int		_scaleDepth(unsigned int, GRID_REF, eTurn &);
+
+		int					_calcMax(GRID_REF, eTurn, int depth, int alpha, int beta);
+		int					_calcMin(GRID_REF, eTurn, int depth, int alpha, int beta);
+		void				_play(GRID_REF, eTurn, int x, int y);
+		void				_cancelPlay(GRID_REF, int x, int y);
+		int					_evaluateGrid(GRID_REF);
 
 		/* Attrs */
 		eTurn				_turn;

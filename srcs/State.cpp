@@ -1,10 +1,10 @@
 #include <State.hpp>
 
-State::State(std::vector<std::vector<eBlock>> grid) : parent(NULL), _grid(grid){
+State::State(std::vector<std::vector<eBlock>> & grid) : _grid(grid){
 
 }
 
-State::State(std::vector<std::vector<eBlock>> grid, State * parentPointer, int X, int Y) : parent(parentPointer), _grid(grid),_x(X), _y(Y){
+State::State(std::vector<std::vector<eBlock>> & grid, int X, int Y) : _grid(grid),_x(X), _y(Y){
 }
 
 State::~State(){}
@@ -25,6 +25,10 @@ std::vector<std::vector<eBlock>>	State::getGrid(void) const{
 	return _grid;
 }
 
+std::vector<std::vector<eBlock>>	&State::getGridRef(void){
+	return _grid;
+}
+
 int									State::getRating(void) const{
 	return _rating;
 }
@@ -39,14 +43,6 @@ void								State::setRating(int rating){
 
 bool  State::operator<(const State & rhs) const{
 	return _rating < rhs.getRating();
-}
-
-void								State::addChild(State child){
-	_children.insert(child);
-}
-
-std::set<State>					State::getChildren(void) const{
-	return _children;
 }
 
 int									State::getX(void)const{

@@ -54,27 +54,16 @@ eBlock	AI::getOpponentPlayerForbidden(void){
 	return (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2_FORBIDDEN : eBlock::PLAYER_1_FORBIDDEN);
 }
 
-std::pair<int, int>	AI::_minMax(std::vector<std::vector<eBlock>> & grid){
+std::pair<int, int>			AI::_minMax(GRID_REF grid){
 
-	State initial(grid);
-
-	State chosen = _findBestMove(initial);
-
-	return std::make_pair(chosen.getX(), chosen.getY());
-}
-
-State			AI::_findBestMove(State & state){
+	int xMax = 0;
+	int yMax = 0;
+	int alpha  = -42000;
+	int beta   = 42000;
 
 	eBlock	opponentPlayerForbidden = getOpponentPlayerForbidden();
 
-	// will contain all results from minmax
-	std::set<State> states;
-
-	GRID grid = state.getGrid();
-
-	unsigned int depth = _scaleDepth(ALGO_DEPTH, grid, _turn);
-
-	std::cout << "DEPTH : " << depth << std::endl;
+	std::cout << "DEPTH : " << ALGO_DEPTH << std::endl;
 
 	for (size_t j = 0; j < GRID_SIZE; j++){
 		for (size_t i = 0; i < GRID_SIZE; i++){
@@ -82,104 +71,108 @@ State			AI::_findBestMove(State & state){
 			// Case is empty or forbidden for the opponent
 			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentPlayerForbidden){
 
-				// Instanciate a new State
-				State child(grid, &state, i, j);
+				_play(grid, _turn, i, j);
 
-				// result of minmax algo for the current node
-				State result = _minMaxExplorer(child, _turn, false, depth);
+				int tmp = _calcMin(grid, notTurn(_turn) ,ALGO_DEPTH - 1, alpha, beta);
 
-				// add the result to the container
-				states.insert(result);
+				if (alpha < tmp){
+					alpha = tmp;
+					xMax = i;
+					yMax = j;
+				}
+
+				_cancelPlay(grid, i, j);
 			}
 		}
 	}
-
-	// return the high rated state
-	return _getMax(states);
+	return std::make_pair(xMax, yMax);
 }
 
-std::vector<State>	AI::getPossibleMoves(State & state, eTurn & turn){
+int		AI::_calcMin(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 
+	// Get opponent forbidden id
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
-	std::vector<State>	container;
+	// end of recursion
+	if (depth == 0) { return _evaluateGrid(grid); }
 
+	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
 		for (size_t i = 0; i < GRID_SIZE; i++){
 
-			// it's a possible move
-			if (state.getGrid()[j][i] == eBlock::EMPTY || state.getGrid()[j][i] == opponentPlayerForbidden){
-				// Copy the grid
-				std::vector<std::vector<eBlock>> grid = state.getGrid();
+			// Check for empty position
+			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentPlayerForbidden){
 
-				// Instanciate a new State
-				State child(grid, &state, i, j);
+				// We can play
+				_play(grid, turn, i, j);
 
-				container.push_back(child);
+				// get max
+				int tmp = _calcMax(grid, notTurn(turn), depth - 1, alpha, beta);
+
+				// Cancel previous move
+				_cancelPlay(grid, i, j);
+
+				// update beta value
+				if (beta > tmp) { beta = tmp; }
+
+				if (beta <= alpha) { return beta; }
 			}
 		}
 	}
-	return container;
+	return beta;
 }
 
-State				AI::_minMaxExplorer(State & state, eTurn & turn, bool isMax, int depth){
+int		AI::_calcMax(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 
-	eTurn opponentTurn = (turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_2);
+	// Get opponent forbidden id
+	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
-	GRID grid = state.getGrid();
+	// end of recursion
+	if (depth == 0) { return _evaluateGrid(grid); }
 
-	if (_checker.checkWin(std::make_pair(state.getX(), state.getY()), grid, turn)){
-		state.setRating(42000);
-		return state;
+	// Iterate through grid
+	for (size_t j = 0; j < GRID_SIZE; j++){
+		for (size_t i = 0; i < GRID_SIZE; i++){
+
+			// Check for empty position
+			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentPlayerForbidden){
+
+				// We can play
+				_play(grid, turn, i, j);
+
+				// get min
+				int tmp = _calcMin(grid, notTurn(turn), depth - 1, alpha, beta);
+
+				// Cancel previous move
+				_cancelPlay(grid, i, j);
+
+				// update min value
+				if (alpha < tmp) { alpha = tmp; }
+
+				if (alpha >= beta) { return alpha; }
+			}
+		}
 	}
-	else if (_checker.checkWin(std::make_pair(state.getX(), state.getY()), grid, opponentTurn)){
-		state.setRating(-42000);
-		return state;
-	}
-	// else if --> match null
-
-	if (depth == 0){
-		state.setRating(_evaluateChild(state));
-		return state;
-	}
-
-	std::vector<State> moves = getPossibleMoves(state, turn);
-
-	std::set<State> states;
-
-	for (size_t i = 0; i < moves.size(); i++){
-		states.insert(_minMaxExplorer(moves[i], turn, !isMax, depth - 1));
-	}
-
-	if (isMax)
-		return _getMax(states);
-	return _getMin(states);
-
+	return alpha;
 }
 
-int			AI::_evaluateChild(State & child){
+void	AI::_play(GRID_REF grid, eTurn turn, int x, int y){
+	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
 
-	(void)child;
+	grid[y][x] = playerPawn;
+}
+
+void	AI::_cancelPlay(GRID_REF grid, int x, int y){
+	grid[y][x] = eBlock::EMPTY;
+}
+
+int			AI::_evaluateGrid(GRID_REF grid){
+
+	(void)grid;
 
 	int rnd = rand() % 100;
 
 	return rnd;
-}
-
-State		AI::_getMax(std::set<State> & states){
-
-	// Get iterator on last element
-	std::set<State>::iterator it = std::prev(states.end());
-
-	return *it;
-}
-
-State		AI::_getMin(std::set<State> & states){
-
-	// Get iterator on last element
-	std::set<State>::iterator it = states.begin();
-
-	return *it;
 }
 
 void			AI::_printSet(std::set<State> states) const{
@@ -188,34 +181,7 @@ void			AI::_printSet(std::set<State> states) const{
 	}
 }
 
-unsigned int	AI::_countEmptyCase(GRID_REF grid, eTurn & turn){
-
-	eBlock opponentForbiden = (turn == TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
-	unsigned int counter = 0;
-
-	for (size_t j = 0; j < GRID_SIZE; j++){
-		for (size_t i = 0; i < GRID_SIZE; i++){
-			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentForbiden)
-				counter++;
-		}
-	}
-
-	return counter;
-}
-
-unsigned int	AI::_scaleDepth(unsigned int depth, GRID_REF grid, eTurn & turn){
-
-	unsigned int nbEmptyCase = _countEmptyCase(grid, turn);
-
-	if (nbEmptyCase < 45)
-		return depth;
-	else if (nbEmptyCase < 90)
-		return depth - 1;
-	else if (nbEmptyCase < 180)
-		return depth - 2;
-	else if (nbEmptyCase < 270)
-		return depth - 3;
-	return 0;
-
-	// unsigned int scaledDepth = depth - ()
+// Return the opposite turn
+eTurn			AI::notTurn(eTurn turn){
+	return (turn == eTurn::TURN_PLAYER_1 ? eTurn::TURN_PLAYER_2 : eTurn::TURN_PLAYER_1);
 }
