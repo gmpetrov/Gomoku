@@ -23,7 +23,7 @@ int main(void)
 
 	eChoice choice;
 
-	// Launch the Menu
+	// // Launch the Menu
 	// if ((choice = graphic.graph->drawMenu()) == eChoice::QUIT){
 
 	// 	// The ESC key has been pressed while in menu

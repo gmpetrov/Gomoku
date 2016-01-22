@@ -17,10 +17,7 @@ RulesChecker & RulesChecker::operator=(RulesChecker const & src){
 **	Take the last move as parameter and check if it's a win
 */
 
-bool	RulesChecker::checkWin(std::pair<int, int> pawn, std::vector<std::vector<eBlock>> & grid, eTurn & turn){
-
-	int	x = pawn.first;
-	int	y = pawn.second;
+bool	RulesChecker::checkWin(int x, int y, std::vector<std::vector<eBlock>> & grid, eTurn & turn){
 
 	return (_checkWinHorizontalCheck(x, y, grid, turn) || _checkWinVerticalCheck(x, y, grid, turn) || _checkWinDiagonalCheck(x, y, grid, turn));
 }
@@ -141,10 +138,7 @@ bool	RulesChecker::_checkWinDiagonalCheck(int x, int y, std::vector<std::vector<
 
 /* Capture Checking */
 
-std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::checkCapture(std::pair<int, int> index, std::vector<std::vector<eBlock>> & grid){
-
-	int x = index.first;
-	int y = index.second;
+std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::checkCapture(int x, int y, std::vector<std::vector<eBlock>> & grid){
 
 	std::pair<PAIR_INT, PAIR_INT> *ptr;
 	if ((ptr = _checkCaptureHorizontal(x, y, grid)) != NULL)
@@ -349,7 +343,7 @@ bool	RulesChecker::checkEndingCapture(std::pair<int, int> index, GRID_REF grid, 
 				grid[j][i] = opponent;
 
 				// if there is possible capture we return true, the game continue
-				if ((ptr = checkCapture(std::make_pair(i, j), grid)) != NULL){
+				if ((ptr = checkCapture(i, j, grid)) != NULL){
 
 					bool res = false;
 					if ((res = _checkIfCaptureBreaksAlignement(ptr, index, grid, turn, container))){
@@ -394,7 +388,7 @@ bool	RulesChecker::_checkIfCaptureBreaksAlignement(std::pair<PAIR_INT, PAIR_INT>
 	_removePawn(container, b, grid);
 
 	// check if it's a win, we want to return the opposite of the return value of checkWinm
-	bool res = !checkWin(last, grid, turn);
+	bool res = !checkWin(last.first, last.second, grid, turn);
 
 	// rollback
 	container.push_back(a);

@@ -74,7 +74,7 @@ std::pair<int, int>			AI::_minMax(GRID_REF grid){
 
 				_play(grid, _turn, i, j);
 
-				int tmp = _calcMin(grid, notTurn(_turn), i, j, ALGO_DEPTH - 1, alpha, beta);
+				int tmp = _calcMin(grid, notTurn(_turn), ALGO_DEPTH - 1, alpha, beta);
 
 				_cancelPlay(grid, i, j);
 
@@ -93,13 +93,13 @@ std::pair<int, int>			AI::_minMax(GRID_REF grid){
 	return std::make_pair(xMax, yMax);
 }
 
-int		AI::_calcMin(GRID_REF grid, eTurn turn, int x, int y, int depth, int alpha, int beta){
+int		AI::_calcMin(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 
 	// Get opponent forbidden id
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) { return _evaluateGrid(grid, turn, x, y); }
+	if (depth == 0) { return _evaluateGrid(grid); }
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
@@ -112,7 +112,7 @@ int		AI::_calcMin(GRID_REF grid, eTurn turn, int x, int y, int depth, int alpha,
 				_play(grid, turn, i, j);
 
 				// get max
-				int tmp = _calcMax(grid, notTurn(turn), i, j, depth - 1, alpha, beta);
+				int tmp = _calcMax(grid, notTurn(turn), depth - 1, alpha, beta);
 
 				// Cancel previous move
 				_cancelPlay(grid, i, j);
@@ -127,13 +127,13 @@ int		AI::_calcMin(GRID_REF grid, eTurn turn, int x, int y, int depth, int alpha,
 	return beta;
 }
 
-int		AI::_calcMax(GRID_REF grid, eTurn turn, int x, int y, int depth, int alpha, int beta){
+int		AI::_calcMax(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 
 	// Get opponent forbidden id
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) { return _evaluateGrid(grid, turn, x, y); }
+	if (depth == 0) { return _evaluateGrid(grid); }
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
@@ -146,7 +146,7 @@ int		AI::_calcMax(GRID_REF grid, eTurn turn, int x, int y, int depth, int alpha,
 				_play(grid, turn, i, j);
 
 				// get min
-				int tmp = _calcMin(grid, notTurn(turn), i, j, depth - 1, alpha, beta);
+				int tmp = _calcMin(grid, notTurn(turn), depth - 1, alpha, beta);
 
 				// Cancel previous move
 				_cancelPlay(grid, i, j);
@@ -171,45 +171,51 @@ void	AI::_cancelPlay(GRID_REF grid, int x, int y){
 	grid[y][x] = eBlock::EMPTY;
 }
 
-int			AI::_evaluateGrid(GRID_REF grid, eTurn turn, int x, int y){
+int			AI::_evaluateGrid(GRID_REF grid){
 
 //	===> Evaluation priority descending order
-	// Close to opponent pawn ?
-	// Break alignement ?
-	// Make alignement ?
-	// Capture ?
-	// Win ?
 
-	// eBlock playerBlock = grid[move.second][move.first];
-	// eBlock opponentBlock = (playerBlock == PLAYER_1 ? PLAYER_2 : PLAYER_1);
+	// 1 - Win
+	// 2 - Stop oppoenent alignement
+	// 3 - Make alignement
+	// 4 - Capture opponent
+	// 4 - Random move
 
-	(void)grid;
-	(void)turn;
-	(void)x;
-	(void)y;
+	eBlock player = (_turn == TURN_PLAYER_1 ? PLAYER_1 : PLAYER_2);
+	eBlock opponent = (player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
+	eTurn opponentTurn = (_turn == TURN_PLAYER_1 ? TURN_PLAYER_2 : TURN_PLAYER_1);
+	std::pair<PAIR_INT, PAIR_INT> *ptr;
 
-	return _heur.stopALignement2(grid);
-	// if ((res = _heur.stopALignement2(grid)) >= 0){
-	// 	// std::cout << "RES : " << res << std::endl;
-	// 	return res;
-	// }
-	// if (_heur.checkWin(move, grid, turn)){
-	// 	return EVAL_WIN;
-	// }
-	// else if (_heur.stopALignement(move, grid, _turn)){
-	// 	// std::cout << "STOP ALIGN" << std::endl;
-	// 	return EVAL_STOP_ALIGN;
-	// }
-	// else if (_heur.checkCapture(move, grid)){
-	// 	return EVAL_CAPTURE;
-	// }
-	// else if (_heur.closeToPawn(grid, playerBlock, move.first, move.second)){
-	// 	return EVAL_ALIGN;
-	// }
-	// else if (_heur.closeToPawn(grid, opponentBlock, move.first, move.second)){
-	// 	return EVAL_CLOSE_OPPOENENT;
-	// }
-	// return rand() % 100 + 1;
+	(void)opponent;
+	(void)opponentTurn;
+	(void)ptr;
+
+	int score = 0;
+	for (size_t j = 0; j < GRID_SIZE; j++){
+		for (size_t i = 0; i < GRID_SIZE; i++){
+
+
+			if (grid[j][i] == player) {
+				if (_checker.checkWin(i, j, grid, _turn)){
+					score += EVAL_WIN;
+				}
+				if ((ptr = _checker.checkCapture(i, j, grid)) != NULL){
+					delete ptr;
+					score += EVAL_CAPTURE;
+				}
+				score += _heur.oneTwoShape(i, j, grid, opponent);
+				score += _heur.oneThreeShape(i, j, grid, opponent);
+
+				// if (_heur.oneThreeShape(i, j, grid, opponent)){
+ 			// 		score += EVAL_ONE_THREE_SHAPE;
+				// }
+				// score += _heur.checkCloseTo(i, j, grid, opponent);
+				// score += (_heur.checkCloseTo(i, j, grid, player));
+				// score += _heur.makeAlign(i, j, grid);
+			}
+		}
+	}
+	return (score == 0 ? rand() % 361 : score);
 }
 
 void			AI::_printSet(std::set<State> states) const{

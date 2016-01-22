@@ -25,8 +25,8 @@ class RulesChecker{
 		RulesChecker(const RulesChecker & src);
 		RulesChecker & operator=(RulesChecker const & src);
 
-		bool								checkWin(std::pair<int, int>, GRID_REF, eTurn &);
-		std::pair<PAIR_INT, PAIR_INT>		*checkCapture(std::pair<int, int>, GRID_REF);
+		bool								checkWin(int, int, GRID_REF, eTurn &);
+		std::pair<PAIR_INT, PAIR_INT>		*checkCapture(int, int, GRID_REF);
 		void								checkDoubleThree(std::pair<int, int>, GRID_REF, eTurn &);
 		// bool 								checkDraw(std::pair<int, int>, GRID_REF, eTurn &);
 

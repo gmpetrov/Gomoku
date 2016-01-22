@@ -78,7 +78,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		std::pair<PAIR_INT, PAIR_INT> *ptr;
 
-		if ((ptr = _checker.checkCapture(index, _grid)) != NULL){
+		if ((ptr = _checker.checkCapture(index.first, index.second, _grid)) != NULL){
 			// checkCapture will respond with a pointer on a pairs of coordinate of the pawns to remove in case of capture
 			// Remember to delete the pointer after utilisation
 
@@ -91,7 +91,7 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 			// Clean
 			delete ptr;
 		}
-		else if (_checker.checkWin(index, _grid, _turn)){
+		else if (_checker.checkWin(index.first, index.second, _grid, _turn)){
 
 			// Check if there is a possible end capture move
 			if (!_checker.checkEndingCapture(index, _grid, _turn, _getOpponentScore(), _getOpponentPawns())){

@@ -16,7 +16,7 @@
 # include <Heuristic.hpp>
 
 
-# define ALGO_DEPTH 3
+# define ALGO_DEPTH 2
 
 class AI{
 	public:
@@ -36,6 +36,7 @@ class AI{
 
 		std::recursive_mutex			algoMutex;
 		std::recursive_mutex			mtx;
+		RulesChecker					_checker;
 
 	private:
 		/* Methods */
@@ -46,12 +47,12 @@ class AI{
 		void				_printSet(std::set<State>) const;
 		unsigned int		_scaleDepth(unsigned int, GRID_REF, eTurn &);
 
-		int					_calcMax(GRID_REF, eTurn, int x, int y, int depth, int alpha, int beta);
-		int					_calcMin(GRID_REF, eTurn, int x, int y, int depth, int alpha, int beta);
+		int					_calcMax(GRID_REF, eTurn, int depth, int alpha, int beta);
+		int					_calcMin(GRID_REF, eTurn, int depth, int alpha, int beta);
 		void				_play(GRID_REF, eTurn, int x, int y);
 		void				_cancelPlay(GRID_REF, int x, int y);
 
-		int					_evaluateGrid(GRID_REF, eTurn, int, int);
+		int					_evaluateGrid(GRID_REF);
 		bool				_closeToOpponentPawn(GRID_REF grid, eBlock opponent, int x, int y);
 
 
