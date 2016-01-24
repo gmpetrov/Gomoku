@@ -82,14 +82,10 @@ std::pair<int, int>			AI::_minMax(GRID_REF grid){
 					alpha = tmp;
 					xMax = i;
 					yMax = j;
-
-					std::cout << "SAVED ALPHA : " << alpha << std::endl;
 				}
 			}
 		}
 	}
-	// std::cout << "ALPHA : " << alpha << std::endl;
-	// std::cout << "BETA  : " << beta << std::endl;
 	return std::make_pair(xMax, yMax);
 }
 
@@ -99,7 +95,12 @@ int		AI::_calcMin(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) { return _evaluateGrid(grid); }
+	if (depth == 0) {
+		int res = _evaluateGrid(grid);
+		// return _evaluateGrid(grid);
+		// std::cout << "SCORE : " << res << std::endl;
+		return res;
+	}
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
@@ -133,7 +134,12 @@ int		AI::_calcMax(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) { return _evaluateGrid(grid); }
+	if (depth == 0) {
+		int res = _evaluateGrid(grid);
+		// return _evaluateGrid(grid);
+		// std::cout << "SCORE : " << res << std::endl;
+		return res;
+	}
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
@@ -162,7 +168,7 @@ int		AI::_calcMax(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 }
 
 void	AI::_play(GRID_REF grid, eTurn turn, int x, int y){
-	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
+	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1_SIM : eBlock::PLAYER_2_SIM);
 
 	grid[y][x] = playerPawn;
 }
@@ -182,6 +188,7 @@ int			AI::_evaluateGrid(GRID_REF grid){
 	// 4 - Random move
 
 	eBlock player = (_turn == TURN_PLAYER_1 ? PLAYER_1 : PLAYER_2);
+	eBlock playerSim = (_turn == TURN_PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 	eBlock opponent = (player == PLAYER_1 ? PLAYER_2 : PLAYER_1);
 	eTurn opponentTurn = (_turn == TURN_PLAYER_1 ? TURN_PLAYER_2 : TURN_PLAYER_1);
 	std::pair<PAIR_INT, PAIR_INT> *ptr;
@@ -195,7 +202,7 @@ int			AI::_evaluateGrid(GRID_REF grid){
 		for (size_t i = 0; i < GRID_SIZE; i++){
 
 
-			if (grid[j][i] == player) {
+			if (grid[j][i] == playerSim) {
 				if (_checker.checkWin(i, j, grid, _turn)){
 					score += EVAL_WIN;
 				}
@@ -205,17 +212,22 @@ int			AI::_evaluateGrid(GRID_REF grid){
 				}
 				score += _heur.oneTwoShape(i, j, grid, opponent);
 				score += _heur.oneThreeShape(i, j, grid, opponent);
+				// score += _heur.makeAlign(i, j, grid);
+				score += (_heur.checkCloseTo(i, j, grid, player));
+			}
+			else if (grid[j][i] == player){
+
+			}
 
 				// if (_heur.oneThreeShape(i, j, grid, opponent)){
  			// 		score += EVAL_ONE_THREE_SHAPE;
 				// }
 				// score += _heur.checkCloseTo(i, j, grid, opponent);
-				// score += (_heur.checkCloseTo(i, j, grid, player));
+
 				// score += _heur.makeAlign(i, j, grid);
-			}
 		}
 	}
-	return (score == 0 ? rand() % 361 : score);
+	return ((score == 0) ? rand() % 361 : score);
 }
 
 void			AI::_printSet(std::set<State> states) const{

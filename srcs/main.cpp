@@ -23,6 +23,7 @@ int main(void)
 
 	eChoice choice;
 
+	choice = eChoice::IA;
 	// // Launch the Menu
 	// if ((choice = graphic.graph->drawMenu()) == eChoice::QUIT){
 
@@ -31,7 +32,7 @@ int main(void)
 	// 	exit(EXIT_SUCCESS);
 	// }
 
-	choice = eChoice::IA;
+
 
 	// Instanciate the board with selected choice
 	Board board(choice);

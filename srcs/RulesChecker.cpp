@@ -27,14 +27,16 @@ bool	RulesChecker::_checkWinHorizontalCheck(int x, int y, std::vector<std::vecto
 	int counter = 0;
 	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
 
-	if (grid[y][x] == playerPawn){ counter++; }
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
+
+	if ((grid[y][x] == playerPawn) || (grid[y][x] == playerPawnSim)){ counter++; }
 
 	// Lateral right check
 	// (x + 1) because we already know actual value at x position
 	for (int i = x + 1; i < GRID_SIZE; i++){
 
 		// right mate is current player pawn, we increment the counter
-		if (grid[y][i] == playerPawn)
+		if ((grid[y][i] == playerPawn) || (grid[y][i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -45,7 +47,7 @@ bool	RulesChecker::_checkWinHorizontalCheck(int x, int y, std::vector<std::vecto
 	for (int i = x - 1; i >= 0; i--){
 
 		// left mate is current player pawn, we increment the counter
-		if (grid[y][i] == playerPawn)
+		if ((grid[y][i] == playerPawn) || (grid[y][i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -59,13 +61,15 @@ bool	RulesChecker::_checkWinVerticalCheck(int x, int y, std::vector<std::vector<
 	int counter = 0;
 	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
 
-	if (grid[y][x] == playerPawn){ counter++; }
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
+
+	if ((grid[y][x] == playerPawn) || (grid[y][x] == playerPawnSim)){ counter++; }
 
 	// Vertical top check
 	// (y - 1) because we already know actual value at y position
 	for (int j = y - 1; j >= 0; j--){
 
-		if (grid[j][x] == playerPawn)
+		if ((grid[j][x] == playerPawn) || (grid[j][x] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -75,7 +79,7 @@ bool	RulesChecker::_checkWinVerticalCheck(int x, int y, std::vector<std::vector<
 	// (y - 1) because we already know actual value at y position
 	for (int j = y + 1; j < GRID_SIZE; j++){
 
-		if (grid[j][x] == playerPawn)
+		if ((grid[j][x] == playerPawn) || (grid[j][x] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -89,12 +93,14 @@ bool	RulesChecker::_checkWinDiagonalCheck(int x, int y, std::vector<std::vector<
 	int counter = 0;
 	eBlock playerPawn = (turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_1 : eBlock::PLAYER_2);
 
-	if (grid[y][x] == playerPawn){ counter++; }
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
+
+	if ((grid[y][x] == playerPawn) || (grid[y][x] == playerPawnSim)){ counter++; }
 
 	// Diagonal top right check
 	for (int i = 1; (x + i < GRID_SIZE) && (y - i >= 0); i++){
 
-		if (grid[y - i][x + i] == playerPawn)
+		if ((grid[y - i][x + i] == playerPawn) || (grid[y - i][x + i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -103,7 +109,7 @@ bool	RulesChecker::_checkWinDiagonalCheck(int x, int y, std::vector<std::vector<
 	// Diagonal bottom left check
 	for (int i = 1; (x - i >= 0) && (y + i < GRID_SIZE); i++){
 
-		if (grid[y + i][x - i] == playerPawn)
+		if ((grid[y + i][x - i] == playerPawn) || (grid[y + i][x - i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -113,12 +119,12 @@ bool	RulesChecker::_checkWinDiagonalCheck(int x, int y, std::vector<std::vector<
 
 	counter = 0;
 
-	if (grid[y][x] == playerPawn){ counter++; }
+	if ((grid[y][x] == playerPawn) || (grid[y][x] == playerPawnSim)){ counter++; }
 
 	// Diagonal bottom right check
 	for (int i = 1; (x + i < GRID_SIZE) && (y + i < GRID_SIZE); i++){
 
-		if (grid[y + i][x + i] == playerPawn)
+		if ((grid[y + i][x + i] == playerPawn) || (grid[y + i][x + i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -127,7 +133,7 @@ bool	RulesChecker::_checkWinDiagonalCheck(int x, int y, std::vector<std::vector<
 	// Diagonal top left check
 	for (int i = 1; (x - i >= 0) && (y - i >= 0); i++){
 
-		if (grid[y - i][x - i] == playerPawn)
+		if ((grid[y - i][x - i] == playerPawn) || (grid[y - i][x - i] == playerPawnSim))
 			counter++;
 		else
 			break ;
@@ -153,19 +159,24 @@ std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::checkCapture(int x, int y, std::ve
 std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureHorizontal(int x, int y, std::vector<std::vector<eBlock>> & grid){
 
 	// get player pawn
-	eBlock playerPawn = grid[y][x];
+	eBlock playerPawn = ((grid[y][x] == PLAYER_1 || grid[y][x] == PLAYER_1_SIM) ? PLAYER_1 : PLAYER_2);
+
+	// get player pawn simulated (needed for the heuristic part)
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// get opponent pawn
 	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	eBlock opponentPawnSim = (opponentPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// Check bounds
 	if (x + 3 < GRID_SIZE){
 
 		// Check from left ro right
-		if (grid[y][x] == playerPawn &&
-			grid[y][x + 1] == opponentPawn &&
-			grid[y][x + 2] == opponentPawn &&
-			grid[y][x + 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y][x + 1] == opponentPawn || grid[y][x + 1] == opponentPawnSim) &&
+			(grid[y][x + 2] == opponentPawn || grid[y][x + 2] == opponentPawnSim) &&
+			(grid[y][x + 3] == playerPawn || grid[y][x + 3] == playerPawnSim)
 			)
 		{
 
@@ -179,10 +190,10 @@ std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureHorizontal(int x, int
 	if (x - 3 >= 0){
 
 		// Check from right to left
-		if (grid[y][x] == playerPawn &&
-			grid[y][x - 1] == opponentPawn &&
-			grid[y][x - 2] == opponentPawn &&
-			grid[y][x - 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y][x - 1] == opponentPawn || grid[y][x - 1] == opponentPawnSim) &&
+			(grid[y][x - 2] == opponentPawn || grid[y][x - 2] == opponentPawnSim) &&
+			(grid[y][x - 3] == playerPawn || grid[y][x - 3] == playerPawnSim)
 			)
 		{
 
@@ -199,19 +210,24 @@ std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureHorizontal(int x, int
 std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureVertical(int x, int y, std::vector<std::vector<eBlock>> & grid){
 
 	// get player pawn
-	eBlock playerPawn = grid[y][x];
+	eBlock playerPawn = ((grid[y][x] == PLAYER_1 || grid[y][x] == PLAYER_1_SIM) ? PLAYER_1 : PLAYER_2);
+
+	// get player pawn simulated (needed for the heuristic part)
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// get opponent pawn
 	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	eBlock opponentPawnSim = (opponentPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// Check if we are out of bounds
 	if (y + 3 < GRID_SIZE){
 
 		// Check from top to bottom
-		if (grid[y][x] == playerPawn &&
-			grid[y + 1][x] == opponentPawn &&
-			grid[y + 2][x] == opponentPawn &&
-			grid[y + 3][x] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y + 1][x] == opponentPawn || grid[y + 1][x] == opponentPawnSim) &&
+			(grid[y + 2][x] == opponentPawn || grid[y + 2][x] == opponentPawnSim) &&
+			(grid[y + 3][x] == playerPawn || grid[y + 3][x] == playerPawnSim)
 			)
 		{
 
@@ -225,10 +241,10 @@ std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureVertical(int x, int y
 	if (y - 3 >= 0){
 
 		// Check from bottom to top
-		if (grid[y][x] == playerPawn &&
-			grid[y - 1][x] == opponentPawn &&
-			grid[y - 2][x] == opponentPawn &&
-			grid[y - 3][x] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y - 1][x] == opponentPawn || grid[y - 1][x] == opponentPawnSim) &&
+			(grid[y - 2][x] == opponentPawn || grid[y - 2][x] == opponentPawnSim) &&
+			(grid[y - 3][x] == playerPawn || grid[y - 3][x] == playerPawnSim)
 			)
 		{
 
@@ -244,19 +260,24 @@ std::pair<PAIR_INT, PAIR_INT>	 *RulesChecker::_checkCaptureVertical(int x, int y
 std::pair<PAIR_INT, PAIR_INT>  *RulesChecker::_checkCaptureDiagonal(int x, int y, std::vector<std::vector<eBlock>> & grid){
 
 	// get player pawn
-	eBlock playerPawn = grid[y][x];
+	eBlock playerPawn = ((grid[y][x] == PLAYER_1 || grid[y][x] == PLAYER_1_SIM) ? PLAYER_1 : PLAYER_2);
+
+	// get player pawn simulated (needed for the heuristic part)
+	eBlock playerPawnSim = (playerPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// get opponent pawn
 	eBlock opponentPawn = (playerPawn == eBlock::PLAYER_1 ? eBlock::PLAYER_2 : eBlock::PLAYER_1);
+
+	eBlock opponentPawnSim = (opponentPawn == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	// Check if we are not out of bounds
 	if (x + 3 < GRID_SIZE && y - 3 >= 0){
 
 		// Check from bottom to top right
-		if (grid[y][x] == playerPawn &&
-			grid[y - 1][x + 1] == opponentPawn &&
-			grid[y - 2][x + 2] == opponentPawn &&
-			grid[y - 3][x + 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y - 1][x + 1] == opponentPawn || grid[y - 1][x + 1] == opponentPawnSim) &&
+			(grid[y - 2][x + 2] == opponentPawn || grid[y - 2][x + 2] == opponentPawnSim) &&
+			(grid[y - 3][x + 3] == playerPawn || grid[y - 3][x + 3] == playerPawnSim)
 			)
 		{
 
@@ -271,10 +292,10 @@ std::pair<PAIR_INT, PAIR_INT>  *RulesChecker::_checkCaptureDiagonal(int x, int y
 	if (x + 3 < GRID_SIZE && y + 3 < GRID_SIZE){
 
 		// Check from top to bottom right
-		if (grid[y][x] == playerPawn &&
-			grid[y + 1][x + 1] == opponentPawn &&
-			grid[y + 2][x + 2] == opponentPawn &&
-			grid[y + 3][x + 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y + 1][x + 1] == opponentPawn || grid[y + 1][x + 1] == opponentPawnSim) &&
+			(grid[y + 2][x + 2] == opponentPawn || grid[y + 2][x + 2] == opponentPawnSim) &&
+			(grid[y + 3][x + 3] == playerPawn || grid[y + 3][x + 3] == playerPawnSim)
 			)
 		{
 
@@ -289,10 +310,10 @@ std::pair<PAIR_INT, PAIR_INT>  *RulesChecker::_checkCaptureDiagonal(int x, int y
 	if (x - 3 >= 0 && y + 3 < GRID_SIZE){
 
 		// Check from top to bottom left
-		if (grid[y][x] == playerPawn &&
-			grid[y + 1][x - 1] == opponentPawn &&
-			grid[y + 2][x - 2] == opponentPawn &&
-			grid[y + 3][x - 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y + 1][x - 1] == opponentPawn || grid[y + 1][x - 1] == opponentPawnSim) &&
+			(grid[y + 2][x - 2] == opponentPawn || grid[y + 2][x - 2] == opponentPawnSim) &&
+			(grid[y + 3][x - 3] == playerPawn || grid[y + 3][x - 3] == playerPawnSim)
 			)
 		{
 
@@ -307,10 +328,10 @@ std::pair<PAIR_INT, PAIR_INT>  *RulesChecker::_checkCaptureDiagonal(int x, int y
 	if (x - 3 >= 0 && y - 3 >= 0){
 
 		// Check from bottom to top left
-		if (grid[y][x] == playerPawn &&
-			grid[y - 1][x - 1] == opponentPawn &&
-			grid[y - 2][x - 2] == opponentPawn &&
-			grid[y - 3][x - 3] == playerPawn
+		if ((grid[y][x] == playerPawn || grid[y][x] == playerPawnSim) &&
+			(grid[y - 1][x - 1] == opponentPawn || grid[y - 1][x - 1] == opponentPawnSim) &&
+			(grid[y - 2][x - 2] == opponentPawn || grid[y - 2][x - 2] == opponentPawnSim) &&
+			(grid[y - 3][x - 3] == playerPawn || grid[y - 3][x - 3] == playerPawnSim)
 			)
 		{
 

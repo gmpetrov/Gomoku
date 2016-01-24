@@ -119,6 +119,7 @@ int Heuristic::makeAlign(int i, int j, GRID_REF grid){
 int Heuristic::chekMakeAlign(int x, int y, GRID_REF grid, int dirX, int dirY){
 
 	eBlock player = (AIturn == TURN_PLAYER_1 ? PLAYER_1 : PLAYER_2);
+	eBlock playerSim = (player == PLAYER_1 ? PLAYER_1_SIM : PLAYER_2_SIM);
 
 	int signX = ((dirX - x) >= 0 ? 1 : -1);
 	int signY = ((dirY - y) >= 0 ? 1 : -1);
@@ -130,7 +131,7 @@ int Heuristic::chekMakeAlign(int x, int y, GRID_REF grid, int dirX, int dirY){
 		for (int i = x; i != dirX; i += (1 * signX)){
 
 			if ((int)i >= 0 && (int)i < GRID_SIZE && (int)j >= 0 && (int)j < GRID_SIZE){
-				if (grid[j][i] == player) { counter++; }
+				if ((grid[j][i] == player) || (grid[j][i] == playerSim)) { counter++; }
 				else{
 					if (counter <= 1)
 						return 0;
@@ -287,7 +288,7 @@ bool Heuristic::oneThreeShape8(int i, int j, GRID_REF grid, eBlock opponent){
 
 	eBlock player = (opponent == PLAYER_1 ? PLAYER_2 : PLAYER_1);
 
-	if (j - 4 >= 0 && i + 3 < GRID_SIZE){
+	if (j - 4 >= 0 && i + 4 < GRID_SIZE){
 		return 	grid[j - 1][i + 1] == opponent &&
 				grid[j - 2][i + 2] == opponent &&
 				grid[j - 3][i + 3] == opponent &&
