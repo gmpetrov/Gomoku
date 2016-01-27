@@ -368,7 +368,7 @@ bool	RulesChecker::checkEndingCapture(std::pair<int, int> index, GRID_REF grid, 
 
 					bool res = false;
 					if ((res = _checkIfCaptureBreaksAlignement(ptr, index, grid, turn, container))){
-						std::cout << "BREAKS 5 STONES" << std::endl;
+						// std::cout << "BREAKS 5 STONES" << std::endl;
 					}
 					else{
 
@@ -756,7 +756,6 @@ void	RulesChecker::_removePawn(std::vector<std::pair<int, int>> & container, std
 	for (std::vector<std::pair<int, int>>::iterator it = container.begin(); it != container.end(); ++it){
 		if (pair_compare(*it, pawn)){
 
-			std::cout << "PAWN REMOVED" << std::endl;
 			// Compare the pawns to find the one to delete
 			container.erase(it);
 			grid[pawn.second][pawn.first] = eBlock::EMPTY;

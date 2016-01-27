@@ -33,11 +33,12 @@ class AI{
 		eBlock				getOpponentPlayerForbidden(void);
 		void				getPossibleMoves(State &, eTurn &, std::vector<State> &);
 		eTurn				notTurn(eTurn);
-		std::pair<int, int>	_minMax(GRID_REF);
+		std::pair<int, int>	_minMax(GRID_REF, eTurn turn);
 
 		std::recursive_mutex			algoMutex;
 		std::recursive_mutex			mtx;
 		RulesChecker					_checker;
+		bool							debug;
 
 	private:
 		/* Methods */
@@ -60,6 +61,7 @@ class AI{
 		double				_elapsedTime;
 		// RulesChecker		_checker;
 		Heuristic			_heur;
+
 
 };
 

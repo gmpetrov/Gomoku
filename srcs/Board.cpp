@@ -268,7 +268,7 @@ void	Board::_updateCaptureScore(void){
 }
 
 void	Board::_moveSuggestion(void){
-	_suggestion = _ai._minMax(_grid);
+	_suggestion = _ai._minMax(_grid, _turn);
 }
 
 std::vector<std::pair<int, int>> & Board::_getCurrentPlayerPawns(void){
@@ -285,6 +285,7 @@ eTurn	Board::getTurn(){
 
 void						Board::setDebugMode(bool value){
 	_debug = value;
+	_ai.debug = value;
 }
 
 bool						Board::isAiTurn(void){

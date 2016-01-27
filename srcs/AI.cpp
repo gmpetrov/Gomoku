@@ -1,7 +1,7 @@
 #include <AI.hpp>
 
 AI::AI(void) : _elapsedTime(0){
-	std::cout << "AI instanciated" << std::endl;
+	// std::cout << "AI instanciated" << std::endl;
 }
 
 AI::~AI(void){}
@@ -22,7 +22,7 @@ std::pair<int, int>		AI::play(std::vector<std::vector<eBlock>> & grid){
 	// Start chrono
 	start = std::chrono::system_clock::now();
 
-	std::pair<int, int>	move = _minMax(grid);
+	std::pair<int, int>	move = _minMax(grid, _turn);
 
 	// End chrono
 	end = std::chrono::system_clock::now();
@@ -55,7 +55,7 @@ eBlock	AI::getOpponentPlayerForbidden(void){
 	return (_turn == eTurn::TURN_PLAYER_1 ? eBlock::PLAYER_2_FORBIDDEN : eBlock::PLAYER_1_FORBIDDEN);
 }
 
-std::pair<int, int>			AI::_minMax(GRID_REF grid){
+std::pair<int, int>			AI::_minMax(GRID_REF grid, eTurn turn){
 
 	int xMax = 0;
 	int yMax = 0;
@@ -64,7 +64,7 @@ std::pair<int, int>			AI::_minMax(GRID_REF grid){
 
 	eBlock	opponentPlayerForbidden = getOpponentPlayerForbidden();
 
-	std::cout << "DEPTH : " << ALGO_DEPTH << std::endl;
+	// std::cout << "DEPTH : " << ALGO_DEPTH << std::endl;
 
 	for (size_t j = 0; j < GRID_SIZE; j++){
 		for (size_t i = 0; i < GRID_SIZE; i++){
@@ -72,16 +72,21 @@ std::pair<int, int>			AI::_minMax(GRID_REF grid){
 			// Case is empty or forbidden for the opponent
 			if (grid[j][i] == eBlock::EMPTY || grid[j][i] == opponentPlayerForbidden){
 
-				_play(grid, _turn, i, j);
+				_play(grid, turn, i, j);
 
-				int tmp = _calcMin(grid, notTurn(_turn), ALGO_DEPTH - 1, alpha, beta);
+				int tmp = _calcMin(grid, notTurn(turn), ALGO_DEPTH - 1, alpha, beta);
 
 				_cancelPlay(grid, i, j);
 
+				if (debug) { std::cout << "tmp : " << tmp << std::endl; }
+
 				if (tmp > alpha){
+
 					alpha = tmp;
 					xMax = i;
 					yMax = j;
+
+					if (debug) { std::cout << "new alpha : " << alpha << std::endl; }
 				}
 			}
 		}
@@ -95,12 +100,7 @@ int		AI::_calcMin(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) {
-		int res = _evaluateGrid(grid);
-		// return _evaluateGrid(grid);
-		// std::cout << "SCORE : " << res << std::endl;
-		return res;
-	}
+	if (depth == 0) { return _evaluateGrid(grid); }
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
@@ -134,12 +134,7 @@ int		AI::_calcMax(GRID_REF grid, eTurn turn, int depth, int alpha, int beta){
 	eBlock	opponentPlayerForbidden = (turn == eTurn::TURN_PLAYER_1 ? PLAYER_2_FORBIDDEN : PLAYER_1_FORBIDDEN);
 
 	// end of recursion
-	if (depth == 0) {
-		int res = _evaluateGrid(grid);
-		// return _evaluateGrid(grid);
-		// std::cout << "SCORE : " << res << std::endl;
-		return res;
-	}
+	if (depth == 0) { return _evaluateGrid(grid); }
 
 	// Iterate through grid
 	for (size_t j = 0; j < GRID_SIZE; j++){
