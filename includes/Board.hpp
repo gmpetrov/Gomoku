@@ -64,6 +64,8 @@ class Board{
 
 		void								_updateTurn(IGraphicHandler *);
 		void								_updateCaptureScore(void);
+		void								_moveSuggestion(void);
+		std::pair<int, int>					_suggestion;
 
 		// Attrs
 		int									_width;

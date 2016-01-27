@@ -33,6 +33,7 @@ class AI{
 		eBlock				getOpponentPlayerForbidden(void);
 		void				getPossibleMoves(State &, eTurn &, std::vector<State> &);
 		eTurn				notTurn(eTurn);
+		std::pair<int, int>	_minMax(GRID_REF);
 
 		std::recursive_mutex			algoMutex;
 		std::recursive_mutex			mtx;
@@ -41,8 +42,6 @@ class AI{
 	private:
 		/* Methods */
 		int					_basicHeuristic(std::vector<std::vector<eBlock>> &);
-
-		std::pair<int, int>	_minMax(GRID_REF);
 
 		void				_printSet(std::set<State>) const;
 		unsigned int		_scaleDepth(unsigned int, GRID_REF, eTurn &);

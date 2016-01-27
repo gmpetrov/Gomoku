@@ -136,7 +136,7 @@ int Heuristic::chekMakeAlign(int x, int y, GRID_REF grid, int dirX, int dirY){
 					if (counter <= 1)
 						return 0;
 					else
-						return counter;
+						return 4;
 				}
 			}
 		}

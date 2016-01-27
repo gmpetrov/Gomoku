@@ -212,19 +212,9 @@ int			AI::_evaluateGrid(GRID_REF grid){
 				}
 				score += _heur.oneTwoShape(i, j, grid, opponent);
 				score += _heur.oneThreeShape(i, j, grid, opponent);
-				// score += _heur.makeAlign(i, j, grid);
-				score += (_heur.checkCloseTo(i, j, grid, player));
+
+				score += _heur.makeAlign(i, j, grid);
 			}
-			else if (grid[j][i] == player){
-
-			}
-
-				// if (_heur.oneThreeShape(i, j, grid, opponent)){
- 			// 		score += EVAL_ONE_THREE_SHAPE;
-				// }
-				// score += _heur.checkCloseTo(i, j, grid, opponent);
-
-				// score += _heur.makeAlign(i, j, grid);
 		}
 	}
 	return ((score == 0) ? rand() % 361 : score);

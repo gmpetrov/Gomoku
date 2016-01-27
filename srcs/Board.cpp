@@ -24,6 +24,9 @@ Board::Board(eChoice choice) : isAlive(true), _choice(choice), _turn(eTurn::TURN
 
 		_ai.setTurn(turn);
 	}
+	else{
+		_suggestion.first = -42;
+	}
 }
 
 Board::~Board(void){
@@ -107,6 +110,8 @@ void 	Board::handleKey(eKeys key, IGraphicHandler *graph){
 
 		// Update turn obviously
 		_updateTurn(graph);
+
+		if (_choice == HUMAN){ _moveSuggestion(); }
 	}
 	else if (key == eKeys::SPACE){
 
@@ -183,6 +188,9 @@ void 	Board::draw(IGraphicHandler *graph){
 
 	drawForbiddenMoves(graph);
 
+	if (_choice == HUMAN && _suggestion.first >= 0)
+		graph->drawPawn(_suggestion.first, _suggestion.second, eColor::GREEN);
+
 	graph->show();
 }
 
@@ -257,6 +265,10 @@ void	Board::_updateCaptureScore(void){
 
 	// Check if it's a win
 	if (captureScore >= 10) { throw std::string("win"); }
+}
+
+void	Board::_moveSuggestion(void){
+	_suggestion = _ai._minMax(_grid);
 }
 
 std::vector<std::pair<int, int>> & Board::_getCurrentPlayerPawns(void){
