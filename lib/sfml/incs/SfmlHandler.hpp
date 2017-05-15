@@ -1,6 +1,7 @@
 #ifndef SFML_HANDLER_HPP
 # define SFML_HANDLER_HPP
 
+# include <unistd.h>
 # include <map>
 # include <IGraphicHandler.hpp>
 # include <SFML/Graphics.hpp>

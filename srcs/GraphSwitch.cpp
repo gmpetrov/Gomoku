@@ -27,8 +27,10 @@ void	GraphSwitch::setGraphic(std::string g){
 	}
 
 	// Open the graphic lib
-	if (!(_dl_handler = dlopen(("./lib/" + g + "/lib" + g + ".so").c_str(), RTLD_LOCAL))){
-		std::cerr << "[dlopen] : Failed to open library" << std::endl;
+	if (!(_dl_handler = dlopen(("/Users/gpetrov/Workspace/Gomoku/lib/" + g + "/lib" + g + ".so").c_str(), RTLD_LOCAL))){
+		std::cerr << "Error : " << dlerror() << std::endl;
+		// std::cerr << "[dlopen] : Failed to open library" << std::endl;
+		// std::cerr << ("/Users/gpetrov/Workspace/Gomoku/lib/" + g + "/lib" + g + ".so").c_str() << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
